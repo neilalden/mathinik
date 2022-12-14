@@ -1,26 +1,26 @@
-import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, TextStyle, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {COLORS} from '../common/utils/colors';
 import LinearGradient from 'react-native-linear-gradient';
 import {SIZE} from '../common/utils/size';
 import {FONT_WEIGHT} from '../common/utils/font';
-export const Button = ({
-  containerStyle,
-  textStyle,
-  onPress,
-  text,
-  gradientColor = [],
-}) => {
+import {ButtonPropType} from './types';
+export const Button = (props: ButtonPropType) => {
+  const onPress = props?.onPress;
+  const text = props?.text;
+  const containerStyle = props?.containerStyle;
+  const textStyle = props?.textStyle;
+  const gradientColor = props?.gradientColor;
   return (
     <TouchableOpacity
       onPress={onPress}
       style={[styles.buttonContainer, containerStyle]}>
-      {gradientColor.length > 0 ? (
+      {gradientColor ? (
         <LinearGradient colors={gradientColor} style={styles.linearGradient}>
-          <Text style={[styles.buttonText, textStyle]}>{text}</Text>
+          <Text style={[styles.buttonText as any, textStyle]}>{text}</Text>
         </LinearGradient>
       ) : (
-        <Text style={[styles.buttonText, textStyle]}>{text}</Text>
+        <Text style={[styles.buttonText as any, textStyle]}>{text}</Text>
       )}
     </TouchableOpacity>
   );

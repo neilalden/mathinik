@@ -1,1 +1,1 @@
-export const APP_NAME = 'PLANTASTIC';
+export const APP_NAME = 'MATHINIK';

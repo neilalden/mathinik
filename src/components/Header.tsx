@@ -5,21 +5,23 @@ import {IMAGES} from '../common/images';
 import {TEXT_SHADOW} from '../common/utils/styles';
 import {COLORS} from '../common/utils/colors';
 import {useRoute, useNavigation} from '@react-navigation/native';
+import {HeaderPropType} from './types';
 
-const Header = props => {
-  const navigation = useNavigation();
+const Header = (props: HeaderPropType) => {
   const text = props?.text;
   const Button = props?.Button;
   const canGoBack = props?.canGoBack ?? true;
+
+  const navigation = useNavigation();
   const goBack = () => navigation.goBack();
   return (
-    <View style={styles.container} elevation={5}>
+    <View style={styles.container}>
       {canGoBack ? (
         <TouchableOpacity style={styles.icon_container} onPress={goBack}>
           <Image source={IMAGES.ic_back} style={styles.icon} />
         </TouchableOpacity>
       ) : (
-        <View style={styles.button}></View>
+        <View style={styles.button} />
       )}
       <Text style={styles.title}>{text}</Text>
       <View style={styles.button}>{Button}</View>
@@ -35,6 +37,7 @@ const styles = StyleSheet.create({
     width: SIZE.p100,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    elevation: 5,
   },
   icon_container: {
     height: SIZE.x50,

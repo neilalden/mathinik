@@ -63,8 +63,7 @@ const BottomNav = props => {
           {marginVertical: SIZE.x14, marginRight: SIZE.x14},
         ]}
         source={
-          routeName === ROUTES.SETTINGS_SCREEN ||
-          routeName === ROUTES.NOTIFICATION_SCREEN
+          routeName === ROUTES.SETTINGS_SCREEN
             ? IMAGES.ic_hamburger
             : IMAGES.ic_hamburger_dark_green
         }

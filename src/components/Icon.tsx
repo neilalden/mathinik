@@ -2,12 +2,13 @@ import {Image, StyleSheet, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {SIZE} from '../common/utils/size';
 import {IMAGES} from '../common/images';
+import {IconPropType} from './types';
 
-const Icon = props => {
+const Icon = (props: IconPropType) => {
   const source = props?.source ?? IMAGES.ic_app;
+  const size = props?.size ?? SIZE.x20;
   const imageStyle = props?.imageStyle;
   const containerStyle = props?.containerStyle;
-  const size = props?.size ?? SIZE.x20;
   const onPress = props?.onPress;
 
   return (

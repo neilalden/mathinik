@@ -3,9 +3,12 @@ import React from 'react';
 import {COLORS} from '../common/utils/colors';
 import LinearGradient from 'react-native-linear-gradient';
 import {ScrollView} from 'react-native-gesture-handler';
-
-const Screen = ({gradientBG = true, style, children}) => {
-  if (gradientBG) {
+import {ScreenPropType} from './types';
+const Screen = (props: ScreenPropType) => {
+  const isBGGradient = props?.isBGGradient ?? true;
+  const style = props?.style;
+  const children = props?.children;
+  if (isBGGradient) {
     return (
       <LinearGradient
         colors={[COLORS.GREEN500, COLORS.DARKGREEN]}

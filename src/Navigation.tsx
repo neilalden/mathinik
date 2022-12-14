@@ -2,14 +2,14 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import * as React from 'react';
 import {ROUTES} from './common/routes';
-import HomeScreen from './screens/HomeScreen';
 import LandingScreen from './screens/LandingScreen';
-import LoginScreen from './screens/LoginScreen';
-import PlantDictionaryScreen from './screens/PlantDictionaryScreen';
-import PlantRecordScreen from './screens/PlantRecordScreen';
+import GradesScreen from './screens/GradesScreen';
+import HomeScreen from './screens/HomeScreen';
+import LeaderboardsScreen from './screens/LeaderboardsScreen';
+import PeopleScreen from './screens/PeopleScreen';
 import RegisterScreen from './screens/RegisterScreen';
-import NotificationScreen from './screens/Settings/NotificationScreen';
-import SettingsScreen from './screens/Settings/SettingsScreen';
+import CreateTodoScreen from './screens/TodoScreens/CreateTodoScreen';
+import AddQuestionScreen from './screens/TodoScreens/AddQuestionScreen';
 const Stack = createStackNavigator();
 const Navigation = () => {
   return (
@@ -21,27 +21,24 @@ const Navigation = () => {
           animationEnabled: false,
         }}>
         <Stack.Screen name={ROUTES.LANDING_SCREEN} component={LandingScreen} />
-        <Stack.Screen name={ROUTES.LOGIN_SCREEN} component={LoginScreen} />
+        <Stack.Screen name={ROUTES.GRADES_SCREEN} component={GradesScreen} />
+        <Stack.Screen name={ROUTES.HOME_SCREEN} component={HomeScreen} />
+        <Stack.Screen
+          name={ROUTES.LEADERBOARDS_SCREEN}
+          component={LeaderboardsScreen}
+        />
+        <Stack.Screen name={ROUTES.PEOPLE_SCREEN} component={PeopleScreen} />
         <Stack.Screen
           name={ROUTES.REGISTER_SCREEN}
           component={RegisterScreen}
         />
-        <Stack.Screen name={ROUTES.HOME_SCREEN} component={HomeScreen} />
         <Stack.Screen
-          name={ROUTES.PLANT_DICTIONARY_SCREEN}
-          component={PlantDictionaryScreen}
+          name={ROUTES.ADD_QUESTION_SCREEN}
+          component={AddQuestionScreen}
         />
         <Stack.Screen
-          name={ROUTES.PLANT_RECORD_SCREEN}
-          component={PlantRecordScreen}
-        />
-        <Stack.Screen
-          name={ROUTES.SETTINGS_SCREEN}
-          component={SettingsScreen}
-        />
-        <Stack.Screen
-          name={ROUTES.NOTIFICATION_SCREEN}
-          component={NotificationScreen}
+          name={ROUTES.CREATE_TODO_SCREEN}
+          component={CreateTodoScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>
