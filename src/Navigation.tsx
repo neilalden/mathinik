@@ -10,6 +10,8 @@ import PeopleScreen from './screens/PeopleScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import CreateTodoScreen from './screens/TodoScreens/CreateTodoScreen';
 import AddQuestionScreen from './screens/TodoScreens/AddQuestionScreen';
+import StudentLessonScreen from './screens/StudentLessonScreen';
+import StudentQuizScreen from './screens/StudentQuizScreen';
 const Stack = createStackNavigator();
 const Navigation = () => {
   return (
@@ -39,6 +41,14 @@ const Navigation = () => {
         <Stack.Screen
           name={ROUTES.CREATE_TODO_SCREEN}
           component={CreateTodoScreen}
+        />
+        <Stack.Screen
+          name={ROUTES.STUDENT_QUIZ_SCREEN}
+          component={StudentQuizScreen}
+        />
+        <Stack.Screen
+          name={ROUTES.STUDENT_LESSON_SCREEN}
+          component={StudentLessonScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

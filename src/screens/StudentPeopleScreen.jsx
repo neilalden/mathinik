@@ -8,7 +8,6 @@ import {Button} from '../components/Buttons';
 import {COLORS} from '../common/utils/colors';
 import {ROUTES} from '../common/routes';
 import {ScrollView} from 'react-native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
 const PeopleScreen = () => {
   // to get current route name
   const route = useRoute();
@@ -53,7 +52,7 @@ const PeopleScreen = () => {
             alignItems: 'center',
             width: '80%',
 
-            paddingHorizontal: 10,
+            padding: 10,
             borderRadius: 6,
             justifyContent: 'space-between',
           }}>
@@ -80,7 +79,7 @@ const PeopleScreen = () => {
             alignItems: 'center',
             width: '80%',
 
-            paddingHorizontal: 10,
+            padding: 10,
             borderRadius: 6,
             justifyContent: 'space-between',
             marginVertical: 10,
@@ -106,9 +105,6 @@ const PeopleScreen = () => {
           style={{
             marginVertical: 30,
             marginLeft: 30,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
           }}>
           <Text
             style={{
@@ -119,9 +115,6 @@ const PeopleScreen = () => {
             }}>
             Students
           </Text>
-          <TouchableOpacity style={{marginRight: 40}}>
-            <Icon source={IMAGES.ic_add} size={30} />
-          </TouchableOpacity>
         </View>
         {/* STUDENT CARDS */}
         <View
@@ -131,7 +124,7 @@ const PeopleScreen = () => {
             alignItems: 'center',
             width: '80%',
 
-            paddingHorizontal: 10,
+            padding: 10,
             borderRadius: 6,
             justifyContent: 'space-between',
           }}>
@@ -158,7 +151,7 @@ const PeopleScreen = () => {
             alignItems: 'center',
             width: '80%',
 
-            paddingHorizontal: 10,
+            padding: 10,
             borderRadius: 6,
             justifyContent: 'space-between',
             marginVertical: 10,
