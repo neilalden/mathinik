@@ -15,11 +15,7 @@ const Icon = (props: IconPropType) => {
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={onPress ? 0.5 : 1}
-      style={[
-        containerStyle,
-        styles.icon_container,
-        {height: size, width: size},
-      ]}>
+      style={[containerStyle, {height: size, width: size}]}>
       <Image
         source={source}
         style={[imageStyle, styles.icon, {height: size, width: size}]}
@@ -31,7 +27,6 @@ const Icon = (props: IconPropType) => {
 export default Icon;
 
 const styles = StyleSheet.create({
-  icon_container: {},
   icon: {
     resizeMode: 'contain',
     alignSelf: 'center',
