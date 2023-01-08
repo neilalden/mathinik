@@ -16,4 +16,12 @@ export const IMAGES = {
   ic_catStanding: require('../assets/icons/ic_catStanding.png'),
   ic_add: require('../assets/icons/ic_add.png'),
   ic_google: require('../assets/icons/ic_google.png'),
+  ic_whiteDoubleProfile: require('../assets/icons/ic_whiteDoubleProfile.png'),
+  ic_whiteMath: require('../assets/icons/ic_whiteMath.png'),
+  ic_whiteGrades: require('../assets/icons/ic_whiteGrades.png'),
+  ic_whiteLeaderboards: require('../assets/icons/ic_whiteLeaderboards.png'),
+  ic_doubleprofile1: require('../assets/icons/ic_doubleprofile1.png'),
+  ic_math1: require('../assets/icons/ic_math1.png'),
+  ic_calendar1: require('../assets/icons/ic_calendar1.png'),
+  ic_leaderboards1: require('../assets/icons/ic_leaderboards1.png'),
 };
