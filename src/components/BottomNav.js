@@ -13,6 +13,7 @@ import {IMAGES} from '../common/images';
 import Icon from './Icon';
 import {ROUTES} from '../common/routes';
 import {useNavigation, useRoute} from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
 
 const BottomNav = props => {
   const routeName = useRoute().name;
@@ -22,52 +23,203 @@ const BottomNav = props => {
   };
   return (
     <SafeAreaView style={styles.container}>
-      <Icon
-        onPress={() => handleOnPress(ROUTES.HOME_SCREEN)}
-        size={SIZE.x40}
-        containerStyle={[
-          styles.icon_container,
-          {marginVertical: SIZE.x14, marginLeft: SIZE.x14},
-        ]}
-        source={
-          routeName === ROUTES.HOME_SCREEN
-            ? IMAGES.ic_home
-            : IMAGES.ic_home_dark_green
-        }
-      />
-      <Icon
-        onPress={() => handleOnPress(ROUTES.PLANT_DICTIONARY_SCREEN)}
-        size={SIZE.x40}
-        containerStyle={[styles.icon_container, {marginVertical: SIZE.x14}]}
-        source={
-          routeName === ROUTES.PLANT_DICTIONARY_SCREEN
-            ? IMAGES.ic_leaf
-            : IMAGES.ic_leaf_dark_green
-        }
-      />
-      <Icon
-        onPress={() => handleOnPress(ROUTES.PLANT_RECORD_SCREEN)}
-        size={SIZE.x40}
-        containerStyle={[styles.icon_container, {marginVertical: SIZE.x14}]}
-        source={
-          routeName === ROUTES.PLANT_RECORD_SCREEN
-            ? IMAGES.ic_report
-            : IMAGES.ic_report_dark_green
-        }
-      />
-      <Icon
-        onPress={() => handleOnPress(ROUTES.SETTINGS_SCREEN)}
-        size={SIZE.x40}
-        containerStyle={[
-          styles.icon_container,
-          {marginVertical: SIZE.x14, marginRight: SIZE.x14},
-        ]}
-        source={
-          routeName === ROUTES.SETTINGS_SCREEN
-            ? IMAGES.ic_hamburger
-            : IMAGES.ic_hamburger_dark_green
-        }
-      />
+      {/*HOME */}
+      {routeName === ROUTES.HOME_SCREEN ? (
+        <View
+          style={[
+            {
+              borderWidth: 3,
+              borderRadius: 14,
+              borderColor: '#00CC66',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 10,
+              marginVertical: 10,
+            },
+          ]}>
+          <Icon
+            onPress={() => handleOnPress(ROUTES.HOME_SCREEN)}
+            size={SIZE.x40}
+            containerStyle={[styles.icon_container]}
+            source={
+              routeName === ROUTES.HOME_SCREEN
+                ? IMAGES.ic_math1
+                : IMAGES.ic_whiteMath
+            }
+          />
+        </View>
+      ) : (
+        <LinearGradient
+          colors={[COLORS.LIGHTGREEN, COLORS.MIDGREEN, COLORS.GREENNORMAL]}
+          style={[
+            {
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 10,
+              borderRadius: 14,
+              marginVertical: 10,
+            },
+          ]}>
+          <Icon
+            onPress={() => handleOnPress(ROUTES.HOME_SCREEN)}
+            size={SIZE.x40}
+            containerStyle={[styles.icon_container]}
+            source={
+              routeName === ROUTES.HOME_SCREEN
+                ? IMAGES.ic_math
+                : IMAGES.ic_whiteMath
+            }
+          />
+        </LinearGradient>
+      )}
+      {/*GRADES*/}
+      {routeName === ROUTES.GRADES_SCREEN ? (
+        <View
+          style={[
+            {
+              borderWidth: 3,
+              borderRadius: 14,
+              borderColor: '#00CC66',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 10,
+              marginVertical: 10,
+            },
+          ]}>
+          <Icon
+            onPress={() => handleOnPress(ROUTES.GRADES_SCREEN)}
+            size={SIZE.x40}
+            containerStyle={[styles.icon_container]}
+            source={
+              routeName === ROUTES.GRADES_SCREEN
+                ? IMAGES.ic_calendar1
+                : IMAGES.ic_whiteGrades
+            }
+          />
+        </View>
+      ) : (
+        <LinearGradient
+          colors={[COLORS.LIGHTGREEN, COLORS.MIDGREEN, COLORS.GREENNORMAL]}
+          style={[
+            {
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 10,
+              borderRadius: 14,
+              marginVertical: 10,
+            },
+          ]}>
+          <Icon
+            onPress={() => handleOnPress(ROUTES.GRADES_SCREEN)}
+            size={SIZE.x40}
+            containerStyle={[styles.icon_container]}
+            source={
+              routeName === ROUTES.GRADES_SCREEN
+                ? IMAGES.ic_calendar1
+                : IMAGES.ic_whiteGrades
+            }
+          />
+        </LinearGradient>
+      )}
+
+      {/*LEADERBOARDS */}
+      {routeName === ROUTES.LEADERBOARDS_SCREEN ? (
+        <View
+          style={[
+            {
+              borderWidth: 3,
+              borderRadius: 14,
+              borderColor: '#00CC66',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 10,
+              marginVertical: 10,
+            },
+          ]}>
+          <Icon
+            onPress={() => handleOnPress(ROUTES.LEADERBOARDS_SCREEN)}
+            size={SIZE.x40}
+            containerStyle={[styles.icon_container]}
+            source={
+              routeName === ROUTES.LEADERBOARDS_SCREEN
+                ? IMAGES.ic_leaderboards1
+                : IMAGES.ic_whiteLeaderboards
+            }
+          />
+        </View>
+      ) : (
+        <LinearGradient
+          colors={[COLORS.LIGHTGREEN, COLORS.MIDGREEN, COLORS.GREENNORMAL]}
+          style={[
+            {
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 10,
+              borderRadius: 14,
+              marginVertical: 10,
+            },
+          ]}>
+          <Icon
+            onPress={() => handleOnPress(ROUTES.LEADERBOARDS_SCREEN)}
+            size={SIZE.x40}
+            containerStyle={[styles.icon_container]}
+            source={
+              routeName === ROUTES.LEADERBOARDS_SCREEN
+                ? IMAGES.ic_leaderboards1
+                : IMAGES.ic_whiteLeaderboards
+            }
+          />
+        </LinearGradient>
+      )}
+      {/*PEOPLE */}
+      {routeName === ROUTES.PEOPLE_SCREEN ? (
+        <View
+          style={[
+            {
+              borderWidth: 3,
+              borderRadius: 14,
+              borderColor: '#00CC66',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 10,
+              marginVertical: 10,
+            },
+          ]}>
+          <Icon
+            onPress={() => handleOnPress(ROUTES.PEOPLE_SCREEN)}
+            size={SIZE.x40}
+            containerStyle={[styles.icon_container]}
+            source={
+              routeName === ROUTES.PEOPLE_SCREEN
+                ? IMAGES.ic_doubleprofile1
+                : IMAGES.ic_whiteDoubleProfile
+            }
+          />
+        </View>
+      ) : (
+        <LinearGradient
+          colors={[COLORS.LIGHTGREEN, COLORS.MIDGREEN, COLORS.GREENNORMAL]}
+          style={[
+            {
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 10,
+              borderRadius: 14,
+              marginVertical: 10,
+            },
+          ]}>
+          <Icon
+            onPress={() => handleOnPress(ROUTES.PEOPLE_SCREEN)}
+            size={SIZE.x40}
+            containerStyle={[styles.icon_container]}
+            source={
+              routeName === ROUTES.PEOPLE_SCREEN
+                ? IMAGES.ic_doubleprofile1
+                : IMAGES.ic_whiteDoubleProfile
+            }
+          />
+        </LinearGradient>
+      )}
     </SafeAreaView>
   );
 };
@@ -76,9 +228,9 @@ export default BottomNav;
 const styles = StyleSheet.create({
   icon_container: {},
   container: {
-    backgroundColor: COLORS.GREEN500,
+    backgroundColor: '#E0EBEB',
     height: SIZE.x80,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
   },
 });
