@@ -1,7 +1,7 @@
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import * as React from 'react';
-import {ROUTES} from './common/routes';
+import { ROUTES } from './common/routes';
 import LandingScreen from './screens/LandingScreen';
 import GradesScreen from './screens/GradesScreen';
 import HomeScreen from './screens/HomeScreen';
@@ -12,8 +12,15 @@ import CreateTodoScreen from './screens/TodoScreens/CreateTodoScreen';
 import AddQuestionScreen from './screens/TodoScreens/AddQuestionScreen';
 import StudentLessonScreen from './screens/StudentLessonScreen';
 import StudentQuizScreen from './screens/StudentQuizScreen';
+import { useDispatch, useSelector } from 'react-redux';
+import { FirebaseCurrentUserType } from './common/types';
+import { StateType } from './services/redux/type';
+import auth from "@react-native-firebase/auth"
+import { isValid } from './common/validation';
 const Stack = createStackNavigator();
+
 const Navigation = () => {
+
   return (
     <NavigationContainer>
       <Stack.Navigator
