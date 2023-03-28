@@ -20,4 +20,5 @@ export const COLORS = {
   PINKNORMAL: '#FF3377',
   MIDPINK: '#ff6699',
   LIGHTPINK: '#ff99bb',
+  RED: '#FF0000',
 };

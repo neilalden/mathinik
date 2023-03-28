@@ -24,4 +24,5 @@ export const IMAGES = {
   ic_math1: require('../assets/icons/ic_math1.png'),
   ic_calendar1: require('../assets/icons/ic_calendar1.png'),
   ic_leaderboards1: require('../assets/icons/ic_leaderboards1.png'),
+  ic_user: require('../assets/icons/ic_user.png'),
 };
