@@ -20,14 +20,17 @@ export const registerUser = createAsyncThunk("user/registerUser", (data: Account
         .get()
         .then((doc) => {
             if (doc.exists) {
-                return "user exist"
+                return undefined
             } else {
+                const firebaseCurrentUser: FirebaseCurrentUserType = auth().currentUser;
                 return firestore()
                     .collection('Users')
                     .doc(data.id)
-                    .set(data)
+                    .set({
+                        ...data,
+                        photoURL: firebaseCurrentUser?.photoURL
+                    })
                     .then(() => {
-                        const firebaseCurrentUser: FirebaseCurrentUserType = auth().currentUser;
                         firebaseCurrentUser?.updateProfile({ displayName: doc.id }).then(() => {
                             return "success"
                         }).catch((error) => console.error(error))

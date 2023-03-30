@@ -14,6 +14,9 @@ export const isValid = (...args: Array<any>) => {
         else if (typeof item === "undefined") return false;
         else if (item === null) return false;
         else if (!!!item) return false;
+        else if (Array.isArray(item)) {
+            if (item.length === 0) return false
+        }
         else if (typeof item === "object") {
             if (Object.keys(item).length === 0) return false;
         }
@@ -21,4 +24,10 @@ export const isValid = (...args: Array<any>) => {
         }
         if (i === args.length - 1) return true
     }
+}
+export const asyncThunkFullfiled = (response) => {
+    if (typeof response !== "object") return false;
+    if (Object.keys(response).length === 0) return false;
+    if (response?.meta?.requestStatus === "fulfilled") return true;
+    return false
 }

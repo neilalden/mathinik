@@ -6,11 +6,57 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {Button} from './Buttons';
-import {COLORS} from '../common/utils/colors';
-import {ScrollView} from 'react-native';
+import { Button } from './Buttons';
+import { COLORS } from '../common/utils/colors';
+import { ScrollView } from 'react-native';
+import { ROUTES } from '../common/routes';
+import { useNavigation } from '@react-navigation/native';
+import { useState } from 'react';
+import { isValid } from '../common/validation';
+import { useDispatch } from 'react-redux';
+import { setQuiz } from '../services/redux/slice/quiz';
 
-const Quiz = ({day, date, pst, setDeadlineSwitch, deadlineSwitch}) => {
+const Quiz = ({
+  deadline,
+  setDeadlineSwitch,
+  deadlineSwitch,
+  showTimepicker,
+  showDatepicker,
+  setShowAlert,
+  setAlertMessage
+}) => {
+
+  const [title, setTitle] = useState("")
+  const [instructions, setInstructions] = useState("")
+  const [pointsPerRight, setPointsPerRight] = useState("5")
+  const [pointsPerWrong, setPointsPerWrong] = useState("0")
+
+  const navigation = useNavigation()
+  const dispatch = useDispatch()
+
+  const handleCreateQuiz = async () => {
+    const valid = isValid(title, instructions, Number(pointsPerRight), Number(pointsPerWrong))
+    if (!valid) {
+      setShowAlert(true);
+      setAlertMessage("All fields are required");
+      return
+    }
+    try {
+      const dispatched = await dispatch(setQuiz({
+        title: title,
+        deadline: deadline,
+        closeOnDeadline: deadlineSwitch,
+        instructions: instructions,
+        pointsPerRight: Number(pointsPerRight),
+        pointsPerWrong: Number(pointsPerWrong),
+      }))
+      if (dispatched) navigation.navigate(ROUTES.ADD_QUESTION_SCREEN, {
+        quizId: dispatched.payload.id,
+      });
+    } catch (error) {
+      console.error(error)
+    }
+  }
   return (
     <>
       <ScrollView
@@ -36,12 +82,12 @@ const Quiz = ({day, date, pst, setDeadlineSwitch, deadlineSwitch}) => {
               marginLeft: 10,
               marginTop: 2,
             }}>
-            <Text style={{fontWeight: 'bold', color: COLORS.BLACK}}>
+            <Text style={{ fontWeight: 'bold', color: COLORS.BLACK }}>
               Quiz Title
             </Text>
           </View>
-          <View style={{marginLeft: 6, paddingTop: 12}}>
-            <TextInput multiline={true} style={{fontSize: 16}} />
+          <View style={{ marginLeft: 6, paddingTop: 12 }}>
+            <TextInput multiline={true} style={{ fontSize: 16 }} value={title} onChangeText={(t) => setTitle(t)} />
           </View>
         </View>
 
@@ -55,29 +101,31 @@ const Quiz = ({day, date, pst, setDeadlineSwitch, deadlineSwitch}) => {
           }}>
           <View>
             <Text
-              style={{fontSize: 24, fontWeight: '500', color: COLORS.BLACK}}>
+              style={{ fontSize: 24, fontWeight: '500', color: COLORS.BLACK }}>
               Deadline
             </Text>
           </View>
           <TouchableOpacity
+            onPress={showDatepicker}
             style={{
               backgroundColor: '#B3FFD9',
               paddingHorizontal: 20,
               paddingVertical: 4,
               borderRadius: 50,
             }}>
-            <Text style={{fontSize: 20, fontWeight: '500', color: '#000'}}>
+            <Text style={{ fontSize: 20, fontWeight: '500', color: '#000' }}>
               Day
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
+            onPress={showTimepicker}
             style={{
               backgroundColor: '#B3FFD9',
               paddingHorizontal: 20,
               paddingVertical: 4,
               borderRadius: 50,
             }}>
-            <Text style={{fontSize: 20, fontWeight: '500', color: '#000'}}>
+            <Text style={{ fontSize: 20, fontWeight: '500', color: '#000' }}>
               Time
             </Text>
           </TouchableOpacity>
@@ -89,30 +137,18 @@ const Quiz = ({day, date, pst, setDeadlineSwitch, deadlineSwitch}) => {
             justifyContent: 'center',
             marginTop: 20,
           }}>
-          <Text style={{marginHorizontal: 2, color: COLORS.BLACK}}>{day}</Text>
-          <Text style={{marginHorizontal: 2, color: COLORS.BLACK}}>{date}</Text>
-          <Text style={{marginHorizontal: 2, color: COLORS.BLACK}}>{pst}</Text>
+          <Text style={{ marginHorizontal: 2, color: COLORS.BLACK }}>{String(deadline)}</Text>
         </View>
 
-        <View style={{marginTop: 20, marginLeft: 16}}>
-          <Text style={{fontSize: 24, fontWeight: '500', color: COLORS.BLACK}}>
+        <View style={{ marginTop: 20, marginLeft: 16 }}>
+          <Text style={{ fontSize: 24, fontWeight: '500', color: COLORS.BLACK }}>
             Close on Deadline
           </Text>
         </View>
 
         <View
-          style={{
-            flexDirection: 'row',
-            backgroundColor: '#00CC66',
-            alignSelf: 'center',
-            marginTop: 10,
-            width: '60%',
 
-            alignItems: 'center',
-            justifyContent: 'space-around',
-            padding: 4,
-            borderRadius: 50,
-          }}>
+          style={styles.optionsViewContainer}>
           <TouchableOpacity
             onPress={() => setDeadlineSwitch(!deadlineSwitch)}
             style={
@@ -163,12 +199,12 @@ const Quiz = ({day, date, pst, setDeadlineSwitch, deadlineSwitch}) => {
               marginLeft: 10,
               marginTop: 2,
             }}>
-            <Text style={{fontWeight: 'bold', color: COLORS.BLACK}}>
+            <Text style={{ fontWeight: 'bold', color: COLORS.BLACK }}>
               Instruction
             </Text>
           </View>
-          <View style={{marginLeft: 6, paddingTop: 12}}>
-            <TextInput multiline={true} style={{fontSize: 16}} />
+          <View style={{ marginLeft: 6, paddingTop: 12 }}>
+            <TextInput multiline={true} style={{ fontSize: 16 }} value={instructions} onChangeText={(text) => setInstructions(text)} />
           </View>
         </View>
         {/* POINTS PER RIGHT ANSWER */}
@@ -188,12 +224,12 @@ const Quiz = ({day, date, pst, setDeadlineSwitch, deadlineSwitch}) => {
               marginLeft: 10,
               marginTop: 2,
             }}>
-            <Text style={{fontWeight: 'bold', color: COLORS.BLACK}}>
+            <Text style={{ fontWeight: 'bold', color: COLORS.BLACK }}>
               Points per right answer
             </Text>
           </View>
-          <View style={{marginLeft: 6, paddingTop: 6}}>
-            <TextInput keyboardType="number-pad" style={{fontSize: 16}} />
+          <View style={{ marginLeft: 6, paddingTop: 6 }}>
+            <TextInput keyboardType="number-pad" style={{ fontSize: 16 }} value={pointsPerRight} onChangeText={(text) => setPointsPerRight(text)} />
           </View>
         </View>
 
@@ -214,12 +250,12 @@ const Quiz = ({day, date, pst, setDeadlineSwitch, deadlineSwitch}) => {
               marginLeft: 10,
               marginTop: 2,
             }}>
-            <Text style={{fontWeight: 'bold', color: COLORS.BLACK}}>
-              Points per right answer
+            <Text style={{ fontWeight: 'bold', color: COLORS.BLACK }}>
+              Points per wrong answer
             </Text>
           </View>
-          <View style={{marginLeft: 6, paddingTop: 6}}>
-            <TextInput keyboardType="number-pad" style={{fontSize: 16}} />
+          <View style={{ marginLeft: 6, paddingTop: 6 }}>
+            <TextInput keyboardType="number-pad" style={{ fontSize: 16 }} value={pointsPerWrong} onChangeText={(text) => setPointsPerWrong(text)} />
           </View>
         </View>
 
@@ -232,11 +268,11 @@ const Quiz = ({day, date, pst, setDeadlineSwitch, deadlineSwitch}) => {
           }}>{`(place a negative value for deduction every incorrect answer)`}</Text>
       </ScrollView>
       <Button
-        text={'Upload file'}
+        text={'Next'}
         gradientColor={[COLORS.LIGHTGREEN, COLORS.MIDGREEN, COLORS.GREENNORMAL]}
-        textStyle={{paddingHorizontal: 20, textTransform: 'uppercase'}}
-        containerStyle={{marginHorizontal: 30, marginVertical: 20}}
-        onPress={() => {}}
+        textStyle={{ paddingHorizontal: 20, textTransform: 'uppercase' }}
+        containerStyle={{ marginHorizontal: 30, marginVertical: 20 }}
+        onPress={handleCreateQuiz}
       />
     </>
   );
@@ -245,25 +281,34 @@ const Quiz = ({day, date, pst, setDeadlineSwitch, deadlineSwitch}) => {
 export default Quiz;
 
 const styles = StyleSheet.create({
+  optionsViewContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#00CC66',
+    alignSelf: 'center',
+    marginTop: 10,
+    width: 150,
+    alignItems: 'center',
+    justifyContent: 'space-around', padding: 4,
+    borderRadius: 50,
+  },
   optionsViewActive: {
     backgroundColor: '#00FF80',
     paddingHorizontal: 6,
-    borderRadius: 16,
+    borderRadius: 50,
   },
   optionsViewInactive: {
     backgroundColor: '#00CC66',
     paddingHorizontal: 6,
-
-    borderRadius: 16,
+    borderRadius: 50,
   },
   optionTextActive: {
     fontSize: 20,
     color: '#000',
-    padding: 4,
+    padding: 8,
   },
   optionTextInactive: {
     fontSize: 20,
-    padding: 4,
-    color: '#d9d9d9',
+    padding: 8,
+    color: 'white',
   },
 });

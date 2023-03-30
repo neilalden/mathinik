@@ -15,24 +15,27 @@ import { useDispatch, useSelector } from 'react-redux';
 import { FirebaseCurrentUserType } from '../common/types';
 import { StateType } from '../services/redux/type';
 import { isValid } from '../common/validation';
+import { asyncThunkFullfiled } from '../common/validation';
 const LandingScreen = (props) => {
   const route = useRoute();
   const navigation = props.navigation
-
-  const dispatch = useDispatch()
-  const user = useSelector((state: StateType) => state.User);
-
+  const user = useSelector((state: StateType) => state.User.user);
+  const dispatch = useDispatch<any>()
   useEffect(() => {
-    const subscriber = auth().onAuthStateChanged((firebaseCurrentUser: FirebaseCurrentUserType) => {
-      if (firebaseCurrentUser?.displayName) {
-        dispatch(fetchUser(firebaseCurrentUser.displayName))
-      }
-      // is firebase authenticated and registered
-      if (isValid(firebaseCurrentUser) && isValid(user.user)) navigation.navigate(ROUTES.HOME_SCREEN)
-      // is firebase authenticated but not registered
-      if (isValid(firebaseCurrentUser) && isValid(user.user) === false) navigation.navigate(ROUTES.REGISTER_SCREEN)
-    });
-    return subscriber; // unsubscribe on unmount
+    try {
+      const subscriber = auth().onAuthStateChanged(async (firebaseCurrentUser: FirebaseCurrentUserType) => {
+        if (firebaseCurrentUser?.displayName) {
+          const dispatched = await dispatch(fetchUser(firebaseCurrentUser.displayName))
+          // is firebase authenticated and registered
+          if (asyncThunkFullfiled(dispatched) && isValid(firebaseCurrentUser) && isValid(user)) navigation.navigate(ROUTES.HOME_SCREEN)
+          // is firebase authenticated but not registered
+          if (asyncThunkFullfiled(dispatched) && isValid(firebaseCurrentUser) && isValid(user) === false) navigation.navigate(ROUTES.REGISTER_SCREEN)
+        }
+      });
+      return subscriber; // unsubscribe on unmount
+    } catch (error) {
+      console.error(error)
+    }
   }, []);
 
 

@@ -19,7 +19,7 @@ import { isValid } from '../common/validation';
 import { setStateEmptyString } from '../common/utils/utility';
 import auth from "@react-native-firebase/auth";
 import { unwrapResult } from '@reduxjs/toolkit';
-import { asyncThunkFullfiled } from '../services/redux/store';
+import { asyncThunkFullfiled } from '../common/validation';
 
 
 const RegisterScreen = (props) => {

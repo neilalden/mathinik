@@ -11,6 +11,7 @@ export type TeacherAccountType = {
     phoneNumber: string;
     dateCreated: Date;
     isTeacher: true;
+    photoURL: string
 }
 export type StudentAccountType = {
     id: string;
@@ -18,39 +19,57 @@ export type StudentAccountType = {
     phoneNumber: string;
     dateCreated: Date;
     isTeacher: false;
+    photoURL?: string
 }
 
 export type TodoType = LectureType | ActivityType | QuizType
 
 export type LectureType = {
+    id: string;
     title: string;
     instructions: string;
-    files?: Array<File>
+    datePosted: Date;
+    files?: Array<File & FileType>;
+    pointsPerRight?: undefined;
+    topScorer?: {
+        student: StudentAccountType;
+        score: number
+    }
 }
-
 export type ActivityType = {
+    id: string;
     title: string;
     deadline: Date;
     closeOnDeadline: boolean;
     instructions: string;
-    pointsPerActivity?: number;
-    files?: Array<File>
+    points: number;
+    files?: Array<File & FileType>;
+    filesRef?: Array<string>;
+    topScorer?: {
+        student: StudentAccountType;
+        score: number
+    }
 }
 
 export type QuizType = {
+    id: string;
     title: string;
     deadline: Date;
     closeOnDeadline: boolean;
     instructions: string;
-    pointsPerRight?: number;
+    pointsPerRight: number;
     pointsPerWrong?: number;
-    questions: Array<QuestionType>
+    questions: Array<QuestionType>;
+    topScorer?: {
+        student: StudentAccountType;
+        score: number
+    }
 }
 export type QuestionType = {
     question: string;
     answer: string;
     answerType: "option" | "write";
-    options?: Array<string>
+    options: Array<string>
 }
 
 export type FirebaseCurrentUserType = FirebaseAuthTypes.User | null
@@ -58,3 +77,12 @@ export type FirebaseTimeStampType = {
     creationTime: number;
     lastSignInTime: number
 }
+
+export type FileType = {
+    fileName: string;
+    uri: string
+}
+
+export type setStateBoolean = React.Dispatch<React.SetStateAction<boolean>>
+export type setStateString = React.Dispatch<React.SetStateAction<string>>
+export type setStateNumber = React.Dispatch<React.SetStateAction<number>>

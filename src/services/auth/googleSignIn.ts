@@ -1,5 +1,6 @@
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { FirebaseCurrentUserType } from '../../common/types';
 
 GoogleSignin.configure({
     webClientId: '1064310901179-31s1fp5ha4nesu037u4hoi1qm87lkv9p.apps.googleusercontent.com',
@@ -17,3 +18,4 @@ export const onGoogleButtonPress = async () => {
     // Sign-in the user with the credential
     return auth().signInWithCredential(googleCredential);
 }
+export const firebaseCurrentUser: FirebaseCurrentUserType = auth().currentUser;

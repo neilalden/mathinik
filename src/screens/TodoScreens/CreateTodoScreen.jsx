@@ -5,57 +5,64 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Screen from '../../components/Screen';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from '../../components/Icon';
-import {IMAGES} from '../../common/images';
+import { IMAGES } from '../../common/images';
 import Quiz from '../../components/Quiz';
-import {Button} from '../../components/Buttons';
-import {COLORS} from '../../common/utils/colors';
+import { Button } from '../../components/Buttons';
+import { COLORS } from '../../common/utils/colors';
 import Activities from '../../components/Activities';
 import Lectures from '../../components/Lectures';
-import {ScrollView} from 'react-native-gesture-handler';
-import {ROUTES} from '../../common/routes';
-
+import { ScrollView } from 'react-native-gesture-handler';
+import { ROUTES } from '../../common/routes';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import AwesomeAlert from 'react-native-awesome-alerts';
+import { useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import { BackHandler } from 'react-native';
 const CreateTodoScreen = () => {
-  const handleBack = () => {
+  const dispatch = useDispatch()
+
+  const handleBack = async () => {
     navigation.goBack();
   };
 
-  const handleOnPress = route => {
-    navigation.navigate(route);
-  };
   const View1 = () => {
     return (
       <Quiz
-        day={day}
-        date={date}
-        pst={pst}
+        deadline={deadline}
         deadlineSwitch={deadlineSwitch}
         setDeadlineSwitch={setDeadlineSwitch}
+        showTimepicker={showTimepicker}
+        showDatepicker={showDatepicker}
+        setShowAlert={setShowAlert}
+        setAlertMessage={setAlertMessage}
       />
     );
   };
   const View2 = () => {
     return (
       <Activities
-        day={day}
-        date={date}
-        pst={pst}
+        deadline={deadline}
         deadlineSwitch={deadlineSwitch}
         setDeadlineSwitch={setDeadlineSwitch}
+        showTimepicker={showTimepicker}
+        showDatepicker={showDatepicker}
+        setShowAlert={setShowAlert}
+        setAlertMessage={setAlertMessage}
       />
     );
   };
   const View3 = () => {
     return (
       <Lectures
-        day={day}
-        date={date}
-        pst={pst}
+        deadline={deadline}
         deadlineSwitch={deadlineSwitch}
         setDeadlineSwitch={setDeadlineSwitch}
+        setShowAlert={setShowAlert}
+        setAlertMessage={setAlertMessage}
       />
     );
   };
@@ -76,33 +83,60 @@ const CreateTodoScreen = () => {
   const navigation = useNavigation();
   const [index, setIndex] = useState(1);
   const [deadlineSwitch, setDeadlineSwitch] = useState(false);
-  const date = 'October 10, 2010';
-  const day = 'Monday';
-  const pst = '12:00: 00';
+  const [deadline, setDeadline] = useState(new Date());
+  const [mode, setMode] = useState('date');
+  const [show, setShow] = useState(false)
+  const [showAlert, setShowAlert] = useState(false)
+  const [alertMessage, setAlertMessage] = useState("")
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || deadline;
+    setShow(Platform.OS === 'ios');
+    setDeadline(currentDate);
+  };
+  const showMode = currentMode => {
+    setShow(true);
+    setMode(currentMode);
+  };
+  const showDatepicker = () => {
+    showMode('date');
+  };
 
+  const showTimepicker = () => {
+    showMode('time');
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handleBack);
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", handleBack);
+    };
+  }, []);
   return (
     <>
-      <ScrollView style={{backgroundColor: '#E0EBEB'}}>
+      <ScrollView style={{ backgroundColor: '#E0EBEB' }}>
+
         <View
           style={{
             marginVertical: 30,
-            marginLeft: 18,
+            marginLeft: 16,
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
           <View>
-            <Icon source={IMAGES.ic_arrowBack} onPress={handleBack} size={40} />
+            <Icon source={IMAGES.ic_arrowBack} onPress={handleBack} size={30} />
           </View>
+
           <View
             style={{
               flexDirection: 'row',
-              marginRight: 14,
+              marginRight: 16,
               backgroundColor: '#00CC66',
               alignItems: 'center',
               padding: 4,
               borderRadius: 50,
             }}>
+
             <TouchableOpacity
               style={{
                 marginHorizontal: 6,
@@ -113,10 +147,11 @@ const CreateTodoScreen = () => {
               onPress={() => {
                 setIndex(1);
               }}>
+
               <Text
                 style={{
-                  fontSize: 20,
-                  fontWeight: 'bold',
+                  fontSize: 22,
+                  fontWeight: '500',
                   textAlign: 'center',
                   color: index == 1 ? COLORS.BLACK : COLORS.WHITE,
                 }}>
@@ -136,8 +171,8 @@ const CreateTodoScreen = () => {
               }}>
               <Text
                 style={{
-                  fontWeight: 'bold',
-                  fontSize: 20,
+                  fontSize: 22,
+                  fontWeight: '500',
                   textAlign: 'center',
                   color: index == 2 ? COLORS.BLACK : COLORS.WHITE,
                 }}>
@@ -156,8 +191,8 @@ const CreateTodoScreen = () => {
               }}>
               <Text
                 style={{
-                  fontWeight: 'bold',
-                  fontSize: 20,
+                  fontSize: 22,
+                  fontWeight: '500',
                   textAlign: 'center',
                   color: index == 3 ? COLORS.BLACK : COLORS.WHITE,
                 }}>
@@ -166,15 +201,30 @@ const CreateTodoScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
+        {show && (
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={deadline}
+            mode={mode}
+            is24Hour={false}
+            display={'default'}
+            onChange={onChange}
+          />
+        )}
 
-        {renderView()}
-        <Button
-          text={'STUDENT LESSON SCREEN'}
-          gradientColor={[COLORS.GREEN100, COLORS.MIDGREEN]}
-          textStyle={{paddingHorizontal: 20}}
-          containerStyle={{marginHorizontal: 30, marginVertical: 20}}
-          onPress={() => handleOnPress(ROUTES.STUDENT_LESSON_SCREEN)}
+        <AwesomeAlert
+          show={showAlert}
+          showProgress={false}
+          title={"Error"}
+          message={alertMessage}
+          closeOnTouchOutside={true}
+          closeOnHardwareBackPress={false}
+          showCancelButton={true}
+          cancelText="Close"
+          cancelButtonColor={COLORS.RED}
+          onCancelPressed={() => setShowAlert(false)}
         />
+        {renderView()}
       </ScrollView>
     </>
   );

@@ -12,11 +12,6 @@ import CreateTodoScreen from './screens/TodoScreens/CreateTodoScreen';
 import AddQuestionScreen from './screens/TodoScreens/AddQuestionScreen';
 import StudentLessonScreen from './screens/StudentLessonScreen';
 import StudentQuizScreen from './screens/StudentQuizScreen';
-import { useDispatch, useSelector } from 'react-redux';
-import { FirebaseCurrentUserType } from './common/types';
-import { StateType } from './services/redux/type';
-import auth from "@react-native-firebase/auth"
-import { isValid } from './common/validation';
 const Stack = createStackNavigator();
 
 const Navigation = () => {

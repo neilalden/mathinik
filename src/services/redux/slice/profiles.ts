@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AccountType, ProfilesType } from "../../../../common/types";
+// import { AccountType, ProfilesType } from "../../../../common/types";
 
 
-const initialState: ProfilesType = {
+const initialState: any = {
     profiles: [],
     countryFilter: "",
     updateIndex: undefined
@@ -21,7 +21,7 @@ export const profilesSlice = createSlice({
         setUpdateIndex: (state, action: PayloadAction<undefined | number>) => {
             state.updateIndex = action.payload
         },
-        updateProfiles: (state, action: PayloadAction<Array<AccountType>>) => {
+        updateProfiles: (state, action: PayloadAction<Array<any>>) => {
             state.profiles = action.payload
         }
     }
