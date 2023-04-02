@@ -1,6 +1,8 @@
 import { PermissionsAndroid } from "react-native";
 import { QuizType, TodoType } from "../types";
 import DocumentPicker from 'react-native-document-picker';
+import { isActivity, isLecture, isQuiz } from "../validation";
+import { COLORS } from "./colors";
 
 export const setStateEmptyString = (...setStates: Array<React.Dispatch<React.SetStateAction<string>>>) => {
     for (const setState of setStates) {
@@ -101,3 +103,5 @@ export const reminder = `Reminder: Most devices only support images, videos,
 text, and PDF files. Any other file types would  require
  students to have the necessary application to open 
 them.`
+
+export const getTodoColor = (todo: TodoType) => isLecture(todo) ? [COLORS.LIGHTBLUE, COLORS.MIDBLUE, COLORS.BLUENORMAL] : isActivity(todo) ? [COLORS.LIGHTORANGE, COLORS.ORANGE, COLORS.DARKORANGE] : isQuiz(todo) ? [COLORS.LIGHTPINK, COLORS.PINK, COLORS.DARKPINK] : [COLORS.DARKPINK, COLORS.PINK, COLORS.LIGHTPINK]

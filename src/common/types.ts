@@ -30,6 +30,7 @@ export type LectureType = {
     instructions: string;
     datePosted: Date;
     files?: Array<File & FileType>;
+    filesRef?: Array<string>;
     pointsPerRight?: undefined;
     topScorer?: {
         student: StudentAccountType;

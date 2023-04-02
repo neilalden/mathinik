@@ -16,9 +16,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { StateType } from '../services/redux/type';
 import { firebaseCurrentUser } from '../services/auth/googleSignIn';
 import { getTodos } from '../services/redux/slice/todo';
-import { getTotalPoints } from '../common/utils/utility';
-import { TodoType } from '../common/types';
+import { getTodoColor, getTotalPoints } from '../common/utils/utility';
+import { QuizType, TodoType } from '../common/types';
 import firestore from '@react-native-firebase/firestore';
+import { customTypeOf, isActivity, isLecture, isQuiz } from '../common/validation';
 const HomeScreen = (props) => {
   // to get current route name
   const route = useRoute();
@@ -63,6 +64,13 @@ const HomeScreen = (props) => {
   const handleOnPress = async () => {
     navigation.navigate(ROUTES.CREATE_TODO_SCREEN);
   };
+  const handleOpenTodo = (todo: TodoType) => {
+    const todoType = customTypeOf(todo);
+    if (todoType === "quiz") navigation.navigate(ROUTES.STUDENT_QUIZ_SCREEN);
+    if (todoType === "activity") navigation.navigate(ROUTES.STUDENT_LESSON_SCREEN)
+  }
+
+
   if (!user) navigation.navigate(ROUTES.LANDING_SCREEN);
   else
     return (
@@ -101,11 +109,12 @@ const HomeScreen = (props) => {
           {
             todos.length > 0 ?
               todos.map((todo: TodoType, i) => {
+                const color = getTodoColor(todo)
                 const points = getTotalPoints(todo)
                 return (
-                  <TouchableOpacity key={i}>
+                  <TouchableOpacity key={i} onPress={() => handleOpenTodo(todo)}>
                     <LinearGradient
-                      colors={[COLORS.LIGHTBLUE, COLORS.MIDBLUE, COLORS.BLUENORMAL]}
+                      colors={color}
                       style={styles.cardContainer}>
                       <View style={styles.cardTitleContainer}>
                         <Text style={styles.cardTitle1}>{todo.title}</Text>
@@ -151,6 +160,7 @@ const HomeScreen = (props) => {
       </>
     );
 };
+
 
 export default HomeScreen;
 
