@@ -4,7 +4,7 @@ import {
   TextInput,
   ToastAndroid,
   TouchableOpacity,
-  View,
+  View, ScrollView
 } from 'react-native';
 import React, { useState } from 'react';
 import Screen from '../../components/Screen';
@@ -15,7 +15,6 @@ import CheckBox from '@react-native-community/checkbox';
 import { Button } from '../../components/Buttons';
 import { COLORS } from '../../common/utils/colors';
 import { ROUTES } from '../../common/routes';
-import { ScrollView } from 'react-native-gesture-handler';
 import { useDispatch, useSelector } from 'react-redux';
 import { StateType } from '../../services/redux/type';
 import { QuestionType, QuizType, setStateBoolean, setStateString } from '../../common/types';

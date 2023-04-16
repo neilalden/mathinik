@@ -3,7 +3,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View, ScrollView
 } from 'react-native';
 import React, { useState } from 'react';
 import Screen from '../../components/Screen';
@@ -15,7 +15,6 @@ import { Button } from '../../components/Buttons';
 import { COLORS } from '../../common/utils/colors';
 import Activities from '../../components/Activities';
 import Lectures from '../../components/Lectures';
-import { ScrollView } from 'react-native-gesture-handler';
 import { ROUTES } from '../../common/routes';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import AwesomeAlert from 'react-native-awesome-alerts';

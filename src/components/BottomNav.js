@@ -88,7 +88,7 @@ const BottomNav = props => {
           ]}>
           <Icon
             onPress={() => {
-              /*handleOnPress(ROUTES.GRADES_SCREEN)*/
+              handleOnPress(ROUTES.GRADES_SCREEN);
             }}
             size={SIZE.x40}
             containerStyle={[styles.icon_container]}
@@ -112,7 +112,7 @@ const BottomNav = props => {
             },
           ]}>
           <Icon
-            // onPress={() => handleOnPress(ROUTES.GRADES_SCREEN)}
+            onPress={() => handleOnPress(ROUTES.GRADES_SCREEN)}
             size={SIZE.x40}
             containerStyle={[styles.icon_container]}
             source={

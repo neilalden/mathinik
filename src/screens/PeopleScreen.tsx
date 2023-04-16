@@ -1,198 +1,182 @@
-import {StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
+import React, { createRef, useRef, useState } from 'react';
 import Screen from '../components/Screen';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from '../components/Icon';
-import {IMAGES} from '../common/images';
-import {Button} from '../components/Buttons';
-import {COLORS} from '../common/utils/colors';
-import {ROUTES} from '../common/routes';
-import {ScrollView} from 'react-native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import { IMAGES } from '../common/images';
+import { Button, ButtonOutline } from '../components/Buttons';
+import { COLORS } from '../common/utils/colors';
+import { ROUTES } from '../common/routes';
+import { ScrollView } from 'react-native';
 import BottomNav from '../components/BottomNav';
+import { useDispatch, useSelector } from 'react-redux';
+import { StateType } from '../services/redux/type';
+import RBSheet from "react-native-raw-bottom-sheet";
+import { addStudentToClass } from '../services/redux/slice/class';
+import { asyncThunkFullfiled, isValid } from '../common/validation';
+import Gap from '../components/Gap';
+
 const PeopleScreen = () => {
-  // to get current route name
   const route = useRoute();
-  // to navigate pages
   const navigation = useNavigation();
-  const taskcompleted = 90;
-  const score = 70;
+  const refRBSheet = useRef();
+  const dispatch = useDispatch()
+  const classDetails = useSelector((state: StateType) => state.Class.classDetails);
+  const user = useSelector((state: StateType) => state.User.user)
+  const [studentId, setStudentId] = useState("")
+
   const handleOnPress = route => {
     navigation.navigate(route);
   };
-  const name = 'Alden Escobarta';
+  const handleOpenBottomSheet = () => {
+    if (user?.isTeacher)
+      refRBSheet.current.open();
+  }
+  const handleAddStudent = () => {
+  }
+  if (!classDetails) return <></>
   return (
     <>
-      <ScrollView style={{backgroundColor: '#E0EBEB'}}>
+      <ScrollView style={{ backgroundColor: '#E0EBEB' }}>
         <View
-          style={{
-            backgroundColor: '#fff',
-            marginHorizontal: 30,
-            marginTop: 30,
-            borderRadius: 16,
-            paddingBottom: 20,
-          }}>
+          style={styles.container}>
           <View
             style={{
-              marginVertical: 30,
+              marginTop: 30,
               marginLeft: 30,
             }}>
             <Text
-              style={{
-                fontSize: 28,
-                fontWeight: '800',
-                textTransform: 'uppercase',
-                color: COLORS.BLACK,
-              }}>
+              style={styles.title}>
               Teacher
             </Text>
           </View>
-          {/* STUDENT CARDS */}
           <View
-            style={{
-              flexDirection: 'row',
-              alignSelf: 'center',
-              alignItems: 'center',
-              width: '80%',
-
-              paddingHorizontal: 10,
-              borderRadius: 6,
-              justifyContent: 'space-between',
-            }}>
+            style={styles.textContainer}>
             <Text
-              style={{fontSize: 20, fontWeight: '500', color: COLORS.BLACK}}>
-              {name}
+              style={styles.text}>
+              {classDetails.teacher.fullname}
             </Text>
 
-            <View style={{borderRadius: 100}}>
+            <View style={{ borderRadius: 100 }}>
               <Icon
                 imageStyle={{
                   borderRadius: 100,
                   backgroundColor: 'gray',
                 }}
-                source={IMAGES.ic_badge}
+                source={{ uri: classDetails.teacher.photoURL }}
                 size={30}
               />
             </View>
           </View>
           {/* STUDENT CARDS */}
-          <View
-            style={{
-              flexDirection: 'row',
-              alignSelf: 'center',
-              alignItems: 'center',
-              width: '80%',
-
-              paddingHorizontal: 10,
-              borderRadius: 6,
-              justifyContent: 'space-between',
-              marginVertical: 10,
-            }}>
-            <Text
-              style={{fontSize: 20, fontWeight: '500', color: COLORS.BLACK}}>
-              {name}
-            </Text>
-
-            <View style={{borderRadius: 100}}>
-              <Icon
-                imageStyle={{
-                  borderRadius: 100,
-                  backgroundColor: 'gray',
-                }}
-                source={IMAGES.ic_badge}
-                size={30}
-              />
-            </View>
-          </View>
-          {/* END OF STUDENT CARDS */}
 
           <View
             style={{
-              marginVertical: 30,
-              marginLeft: 30,
+              paddingLeft: 30,
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
+              height: 60
             }}>
             <Text
-              style={{
-                fontSize: 28,
-                fontWeight: '800',
-                textTransform: 'uppercase',
-                color: COLORS.BLACK,
-              }}>
+              style={styles.title}>
               Students
             </Text>
-            <TouchableOpacity style={{marginRight: 40}}>
-              <Icon source={IMAGES.ic_add} size={30} />
-            </TouchableOpacity>
+            {
+              user?.isTeacher ?
+                <TouchableOpacity style={{ paddingHorizontal: 40, paddingVertical: 30, }} onPress={handleOpenBottomSheet}>
+                  <Icon source={IMAGES.ic_add} size={30} />
+                </TouchableOpacity> : <Gap height={90} />
+            }
           </View>
           {/* STUDENT CARDS */}
-          <View
-            style={{
-              flexDirection: 'row',
-              alignSelf: 'center',
-              alignItems: 'center',
-              width: '80%',
-
-              paddingHorizontal: 10,
-              borderRadius: 6,
-              justifyContent: 'space-between',
-            }}>
-            <Text
-              style={{fontSize: 20, fontWeight: '500', color: COLORS.BLACK}}>
-              {name}
-            </Text>
-
-            <View style={{borderRadius: 100}}>
-              <Icon
-                imageStyle={{
-                  borderRadius: 100,
-                  backgroundColor: 'gray',
-                }}
-                source={IMAGES.ic_badge}
-                size={30}
-              />
-            </View>
-          </View>
-          {/* STUDENT CARDS */}
-          <View
-            style={{
-              flexDirection: 'row',
-              alignSelf: 'center',
-              alignItems: 'center',
-              width: '80%',
-
-              paddingHorizontal: 10,
-              borderRadius: 6,
-              justifyContent: 'space-between',
-              marginVertical: 10,
-            }}>
-            <Text
-              style={{fontSize: 20, fontWeight: '500', color: COLORS.BLACK}}>
-              {name}
-            </Text>
-
-            <View style={{borderRadius: 100}}>
-              <Icon
-                imageStyle={{
-                  borderRadius: 100,
-                  backgroundColor: 'gray',
-                }}
-                source={IMAGES.ic_badge}
-                size={30}
-              />
-            </View>
-          </View>
+          {classDetails?.students.map((student, _) => {
+            return (
+              <View
+                key={_}
+                style={styles.textContainer}>
+                <Text
+                  style={styles.text}>
+                  {student.fullname}
+                </Text>
+                <View style={{ borderRadius: 100 }}>
+                  <Icon
+                    imageStyle={{
+                      borderRadius: 100,
+                      backgroundColor: 'gray',
+                    }}
+                    source={{ uri: student.photoURL }}
+                    size={30}
+                  />
+                </View>
+              </View>
+            )
+          })}
           {/* END OF STUDENT CARDS */}
         </View>
-        <Button
-          text={'Continue to Register SC'}
-          gradientColor={[COLORS.GREEN300, COLORS.GREEN500]}
-          textStyle={{paddingHorizontal: 20}}
-          containerStyle={{marginHorizontal: 30, marginVertical: 20}}
-          onPress={() => handleOnPress(ROUTES.REGISTER_SCREEN)}
-        />
+        <RBSheet
+          ref={refRBSheet}
+          closeOnDragDown={true}
+          closeOnPressMask={false}
+          customStyles={{
+            wrapper: {
+              backgroundColor: "rgba(0,0,0, .50)"
+            },
+            draggableIcon: {
+              backgroundColor: "#000"
+            },
+            container: styles.sheetContainer
+          }}
+        >
+          <View style={styles.sheetContainer}>
+            <View
+              style={{
+                backgroundColor: 'transparent',
+                marginHorizontal: 20,
+                borderWidth: 1,
+                borderColor: '#00CC66',
+                borderRadius: 16,
+                marginBottom: 10,
+                marginTop: 10,
+              }}>
+              <View
+                style={{
+                  position: 'absolute',
+                  marginLeft: 10,
+                  marginTop: 2,
+                }}>
+                <Text style={{ fontWeight: 'bold', color: COLORS.BLACK }}>
+                  Student ID
+                </Text>
+              </View>
+              <View style={{ marginLeft: 6, paddingTop: 10 }}>
+                <TextInput keyboardType="number-pad" style={{ fontSize: 16 }} value={studentId} onChangeText={(text) => { setStudentId(text) }} />
+              </View>
+            </View>
+            <Button text='Add'
+              gradientColor={[COLORS.LIGHTGREEN, COLORS.MIDGREEN, COLORS.GREENNORMAL]}
+              textStyle={{
+                paddingHorizontal: 20,
+                textTransform: 'uppercase',
+                color: COLORS.BLACK,
+              }}
+              containerStyle={{
+                marginHorizontal: 20,
+                marginVertical: 10,
+              }}
+              onPress={async () => {
+                if (!isValid(studentId)) return;
+                const dispatched = await dispatch(addStudentToClass({
+                  classId: classDetails.classId,
+                  studentId: studentId
+                }));
+                if (asyncThunkFullfiled(dispatched)) {
+                  setStudentId("")
+                  refRBSheet.current.close();
+                }
+              }} />
+          </View>
+        </RBSheet>
       </ScrollView>
       <BottomNav routeName={route.name} navigation={navigation} />
     </>
@@ -201,4 +185,32 @@ const PeopleScreen = () => {
 
 export default PeopleScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#fff',
+    marginHorizontal: 30,
+    marginTop: 30,
+    borderRadius: 16,
+    paddingBottom: 20,
+  }, title: {
+    fontSize: 28,
+    fontWeight: '800',
+    textTransform: 'uppercase',
+    color: COLORS.BLACK,
+  },
+  textContainer: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    alignItems: 'center',
+    width: '80%',
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    justifyContent: 'space-between',
+    paddingTop: 10,
+  },
+  text: { fontSize: 20, fontWeight: '500', color: COLORS.BLACK },
+  sheetContainer: {
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  }
+});

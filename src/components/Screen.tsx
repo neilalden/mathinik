@@ -1,9 +1,8 @@
-import {StyleSheet, SafeAreaView} from 'react-native';
+import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import React from 'react';
-import {COLORS} from '../common/utils/colors';
+import { COLORS } from '../common/utils/colors';
 import LinearGradient from 'react-native-linear-gradient';
-import {ScrollView} from 'react-native-gesture-handler';
-import {ScreenPropType} from './types';
+import { ScreenPropType } from './types';
 const Screen = (props: ScreenPropType) => {
   const isBGGradient = props?.isBGGradient ?? true;
   const style = props?.style;
@@ -29,6 +28,7 @@ export default Screen;
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: "#E0EBEB",
     flex: 1,
   },
 });

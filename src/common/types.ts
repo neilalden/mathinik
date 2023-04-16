@@ -11,7 +11,8 @@ export type TeacherAccountType = {
     phoneNumber: string;
     dateCreated: Date;
     isTeacher: true;
-    photoURL: string
+    photoURL: string;
+    classId?: string
 }
 export type StudentAccountType = {
     id: string;
@@ -19,7 +20,8 @@ export type StudentAccountType = {
     phoneNumber: string;
     dateCreated: Date;
     isTeacher: false;
-    photoURL?: string
+    photoURL?: string;
+    classId?: string
 }
 
 export type TodoType = LectureType | ActivityType | QuizType
@@ -87,3 +89,48 @@ export type FileType = {
 export type setStateBoolean = React.Dispatch<React.SetStateAction<boolean>>
 export type setStateString = React.Dispatch<React.SetStateAction<string>>
 export type setStateNumber = React.Dispatch<React.SetStateAction<number>>
+
+export type ActivitySubmission = {
+    answer: string;
+    score: number;
+    createdAt: Date;
+    id: StudentAccountType["id"];
+    name: StudentAccountType["fullname"]
+}
+
+export type QuizSubmission = {
+    answers: Array<QuizAnswer>;
+    score: number;
+    createdAt: Date;
+    id: StudentAccountType["id"];
+    name: StudentAccountType["fullname"]
+}
+export type QuizAnswer = {
+    question: QuestionType["question"];
+    correctAnswer: QuestionType["answer"]
+    answer: string;
+}
+export type SubmitQuizType = {
+    payload: QuizSubmission;
+    classId: TeacherAccountType["id"];
+    quizId: QuizType["id"]
+}
+
+export type RankingItem = {
+    student: StudentAccountType;
+    points: number
+}
+
+export type StudentGrade = {
+    student: StudentAccountType;
+    submissions: QuizSubmission | ActivitySubmission;
+    average: number
+}
+
+export type ClassType = {
+    classId: TeacherAccountType["id"];
+    teacher: TeacherAccountType;
+    students: Array<StudentAccountType>;
+    ranking: Array<RankingItem>;
+    studentGrades: Array<StudentGrade>
+}

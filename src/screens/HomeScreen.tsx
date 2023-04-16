@@ -1,5 +1,8 @@
-import { StyleSheet, Text, Image, View } from 'react-native';
-import React, { useEffect } from 'react';
+import {
+  StyleSheet, Text, Image, View, TouchableOpacity
+  , ScrollView
+} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
 import Screen from '../components/Screen';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { IMAGES } from '../common/images';
@@ -8,8 +11,6 @@ import { Button } from '../components/Buttons';
 import { COLORS } from '../common/utils/colors';
 import { ROUTES } from '../common/routes';
 import LinearGradient from 'react-native-linear-gradient';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { ScrollView } from 'react-native-gesture-handler';
 import BottomNav from '../components/BottomNav';
 import { getPeriodOfDay } from '../common/utils/time';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,45 +20,67 @@ import { getTodos } from '../services/redux/slice/todo';
 import { getTodoColor, getTotalPoints } from '../common/utils/utility';
 import { QuizType, TodoType } from '../common/types';
 import firestore from '@react-native-firebase/firestore';
-import { customTypeOf, isActivity, isLecture, isQuiz } from '../common/validation';
+import { asyncThunkFullfiled, customTypeOf, isActivity, isLecture, isQuiz } from '../common/validation';
+import { setCurrentQuiz } from "../services/redux/slice/quiz"
+import { getClassDetails } from '../services/redux/slice/class';
 const HomeScreen = (props) => {
   // to get current route name
   const route = useRoute();
   // to navigate pages
-  const studentName = 'Neil';
   const taskcompleted = 80;
   const navigation = props.navigation;
   const dispatch = useDispatch<any>()
   const user = useSelector((state: StateType) => state.User.user)
+  const submissions = useSelector((state: StateType) => state.Todo.submissions);
   const todos = useSelector((state: StateType) => state.Todo.todos)
-  const displayName = String(user?.fullname).split(" ").slice(0, 2).join(" ")
-
+  const displayName = String(user?.fullname).split(" ").slice(0, 2).join(" ");
+  const classDetails = useSelector((state: StateType) => state.Class?.classDetails);
+  const [hasAnswered, setHasAnswered] = useState(0);
+  useEffect(() => {
+    if (submissions && hasAnswered !== 0) {
+      let num = 0
+      submissions.map(_ => {
+        num += _.score > 0 ? 1 : 0
+      });
+      setHasAnswered((num / classDetails?.students.length) * 100)
+    }
+  }, [])
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection(`Classes/${classDetails?.classId}/quizes`)
+      .onSnapshot(async (documentSnapshot) => {
+        const dispatched = await dispatch(getTodos(classDetails?.classId))
+      });
+    return () => subscriber();
+  }, [classDetails?.classId]);
 
   useEffect(() => {
     const subscriber = firestore()
-      .collection(`Classes/${user?.id}/quizes`)
+      .collection(`Classes/${classDetails?.classId}/activities`)
       .onSnapshot(async (documentSnapshot) => {
-        const dispatched = await dispatch(getTodos())
+        const dispatched = await dispatch(getTodos(classDetails?.classId))
       });
     return () => subscriber();
-  }, [user?.id]);
+  }, [classDetails?.classId]);
 
   useEffect(() => {
     const subscriber = firestore()
-      .collection(`Classes/${user?.id}/activities`)
+      .collection(`Classes/${classDetails?.classId}/lectures`)
       .onSnapshot(async (documentSnapshot) => {
-        const dispatched = await dispatch(getTodos())
+        const dispatched = await dispatch(getTodos(classDetails?.classId))
       });
     return () => subscriber();
-  }, [user?.id]);
+  }, [classDetails?.classId]);
 
   useEffect(() => {
-    const subscriber = firestore()
-      .collection(`Classes/${user?.id}/lectures`)
-      .onSnapshot(async (documentSnapshot) => {
-        const dispatched = await dispatch(getTodos())
-      });
-    return () => subscriber();
+    (async () => {
+      try {
+        if (!user?.classId || classDetails && !Object.keys(classDetails)) return;
+        const dispatched = await dispatch(getClassDetails(user?.classId))
+      } catch (error) {
+        console.error(error)
+      }
+    })();
   }, [user?.id]);
 
 
@@ -66,8 +89,14 @@ const HomeScreen = (props) => {
   };
   const handleOpenTodo = (todo: TodoType) => {
     const todoType = customTypeOf(todo);
-    if (todoType === "quiz") navigation.navigate(ROUTES.STUDENT_QUIZ_SCREEN);
-    if (todoType === "activity") navigation.navigate(ROUTES.STUDENT_LESSON_SCREEN)
+    if (todoType === "quiz") {
+      const quiz: QuizType = todo
+      dispatch(setCurrentQuiz(quiz))
+      navigation.navigate(ROUTES.STUDENT_QUIZ_SCREEN);
+    }
+    else if (todoType === "activity") {
+      navigation.navigate(ROUTES.STUDENT_LESSON_SCREEN)
+    }
   }
 
 
@@ -92,7 +121,7 @@ const HomeScreen = (props) => {
             style={styles.jumbotron}>
             <View style={{ flex: 2 }}>
               <Text
-                style={styles.jumbotronText}>{`You have solved ${taskcompleted}% of your task!`}</Text>
+                style={styles.jumbotronText}>{user.isTeacher ? `${hasAnswered}% of students has answered the latest todo` : `You have solved ${taskcompleted}% of your task!`}</Text>
             </View>
             <View style={{ flex: 1 }}>
               <Icon source={IMAGES.ic_catSleep} size={150} />
@@ -125,7 +154,7 @@ const HomeScreen = (props) => {
                           <View style={styles.cardDescImgContainer}>
                             <View style={styles.cardDescContainer}>
                               <Text style={styles.cardDesc1}>Top Scorer</Text>
-                              <Text style={styles.cardDesc2}>{`${studentName}`}</Text>
+                              <Text style={styles.cardDesc2}>{`${displayName}`}</Text>
                             </View>
                             <Icon
                               source={IMAGES.ic_catRead}
@@ -148,13 +177,6 @@ const HomeScreen = (props) => {
                 No options added yet.
               </Text>
           }
-          {/* <Button
-            text={'Continue to Leaderboards'}
-            gradientColor={[COLORS.GREEN100, COLORS.MIDGREEN]}
-            textStyle={{ paddingHorizontal: 20 }}
-            containerStyle={{ marginHorizontal: 30, marginVertical: 20 }}
-            onPress={() => handleOnPress(ROUTES.LEADERBOARDS_SCREEN)}
-          /> */}
         </ScrollView>
         <BottomNav routeName={route.name} navigation={navigation} />
       </>

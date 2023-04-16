@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AccountType, FirebaseCurrentUserType } from "../../../common/types";
+import { AccountType, FirebaseCurrentUserType, StudentAccountType } from "../../../common/types";
 import firestore from '@react-native-firebase/firestore';
 import auth from "@react-native-firebase/auth";
 export type UserStateType = {
@@ -13,7 +13,7 @@ const initialState: UserStateType = {
     user: undefined
 }
 
-export const registerUser = createAsyncThunk("user/registerUser", (data: AccountType) => {
+export const registerUser = createAsyncThunk("user/registerUser", (data: StudentAccountType) => {
     return firestore()
         .collection('Users')
         .doc(data.id)
@@ -41,6 +41,10 @@ export const registerUser = createAsyncThunk("user/registerUser", (data: Account
 })
 
 export const fetchUser = createAsyncThunk("user/fetchUser", (id: AccountType["id"]) => {
+    return firebaseFetchUser(id)
+})
+
+export const firebaseFetchUser = (id) => {
     return firestore()
         .collection('Users')
         .doc(id)
@@ -49,7 +53,7 @@ export const fetchUser = createAsyncThunk("user/fetchUser", (id: AccountType["id
             return result.data()
         })
         .catch((error) => error)
-})
+}
 
 export const UsersSlice = createSlice({
     name: "user",

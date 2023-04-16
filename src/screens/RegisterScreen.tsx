@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, ScrollView } from 'react-native';
 import React, { useEffect, useState, } from 'react';
 import Screen from '../components/Screen';
 import { useRoute } from '@react-navigation/native';
@@ -6,7 +6,6 @@ import Icon from '../components/Icon';
 import { Button } from '../components/Buttons';
 import { COLORS } from '../common/utils/colors';
 import { ROUTES } from '../common/routes';
-import { ScrollView } from 'react-native-gesture-handler';
 import { IMAGES } from '../common/images';
 import TextInput from '../components/TextInput';
 import { useDispatch, useSelector } from 'react-redux';
@@ -64,7 +63,8 @@ const RegisterScreen = (props) => {
       id,
       phoneNumber,
       isTeacher: false,
-      dateCreated: new Date()
+      dateCreated: new Date(),
+      classId: "0418-0000"
     }
     const registration = await dispatch(registerUser(data))
     if (asyncThunkFullfiled(registration)) {
@@ -108,7 +108,7 @@ const RegisterScreen = (props) => {
           <Icon
             source={IMAGES.ic_catRead}
             size={140}
-            imageStyle={{ borderRadius: 100, backgroundColor: '#152238' }}
+            imageStyle={{ borderRadius: 100 }}
           />
         </View>
         <TextInput
@@ -137,7 +137,7 @@ const RegisterScreen = (props) => {
         />
       </View>
       <Button
-        text={'Continue ADD Question SC'}
+        text={'SIGN UP!'}
         gradientColor={[COLORS.GREEN300, COLORS.GREEN500]}
         textStyle={{ paddingHorizontal: 20 }}
         containerStyle={{ marginHorizontal: 30, marginVertical: 20 }}

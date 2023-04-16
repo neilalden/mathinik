@@ -6,6 +6,7 @@ import { default as User } from './slice/user';
 import { default as Quiz } from './slice/quiz';
 import { default as Todo } from './slice/todo';
 import { default as Activity } from './slice/activity';
+import { default as Class } from './slice/class';
 import thunk from "redux-thunk"
 import * as reduxThunk from "redux-thunk/extend-redux";
 
@@ -14,7 +15,7 @@ const persistConfig = {
     storage: AsyncStorage
 }
 
-const reducers = combineReducers({ Profiles, User, Quiz, Todo, Activity })
+const reducers = combineReducers({ Profiles, User, Quiz, Todo, Activity, Class })
 
 const persistedReducer = persistReducer(persistConfig, reducers)
 
