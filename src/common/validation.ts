@@ -33,6 +33,12 @@ export const asyncThunkFullfiled = (response) => {
   if (response?.meta?.requestStatus === "fulfilled") return true;
   return false
 }
+export const asyncThunkFailed = (response) => {
+  if (typeof response !== "object") return false;
+  if (Object.keys(response).length === 0) return false;
+  if (response?.meta?.requestStatus === "rejected") return true;
+  return false
+}
 
 export const isQuiz = (todo: TodoType): todo is QuizType => {
   const quiz: QuizType = {

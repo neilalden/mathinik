@@ -2,6 +2,8 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AccountType, FirebaseCurrentUserType, StudentAccountType } from "../../../common/types";
 import firestore from '@react-native-firebase/firestore';
 import auth from "@react-native-firebase/auth";
+import firebase from "@react-native-firebase/app"
+
 export type UserStateType = {
     loading: boolean
     error?: string
@@ -23,6 +25,7 @@ export const registerUser = createAsyncThunk("user/registerUser", (data: Student
                 return undefined
             } else {
                 const firebaseCurrentUser: FirebaseCurrentUserType = auth().currentUser;
+                if (!firebaseCurrentUser) return;
                 return firestore()
                     .collection('Users')
                     .doc(data.id)
@@ -32,7 +35,13 @@ export const registerUser = createAsyncThunk("user/registerUser", (data: Student
                     })
                     .then(() => {
                         firebaseCurrentUser?.updateProfile({ displayName: doc.id }).then(() => {
-                            return "success"
+                            data["photoURL"] = String(firebaseCurrentUser.photoURL)
+                            return firestore()
+                                .collection("Classes")
+                                .doc(data.classId)
+                                .update({ students: firebase.firestore.FieldValue.arrayUnion(data) })
+                                .then(() => "success")
+                                .catch(error => console.error(error))
                         }).catch((error) => console.error(error))
                     })
                     .catch((error) => error)

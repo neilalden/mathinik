@@ -192,6 +192,8 @@ const Quiz = ({
             borderRadius: 16,
             marginBottom: 24,
             marginTop: 30,
+            height: 100
+
           }}>
           <View
             style={{

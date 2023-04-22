@@ -11,6 +11,7 @@ import RegisterScreen from './screens/RegisterScreen';
 import CreateTodoScreen from './screens/TodoScreens/CreateTodoScreen';
 import AddQuestionScreen from './screens/TodoScreens/AddQuestionScreen';
 import StudentLessonScreen from './screens/StudentLessonScreen';
+import StudentActivityScreen from './screens/StudentActivityScreen';
 import StudentQuizScreen from './screens/StudentQuizScreen';
 const Stack = createStackNavigator();
 
@@ -47,6 +48,10 @@ const Navigation = () => {
         <Stack.Screen
           name={ROUTES.STUDENT_QUIZ_SCREEN}
           component={StudentQuizScreen}
+        />
+        <Stack.Screen
+          name={ROUTES.STUDENT_ACTIVITY_SCREEN}
+          component={StudentActivityScreen}
         />
         <Stack.Screen
           name={ROUTES.STUDENT_LESSON_SCREEN}

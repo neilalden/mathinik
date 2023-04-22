@@ -22,20 +22,16 @@ const LandingScreen = (props) => {
   const user = useSelector((state: StateType) => state.User.user);
   const dispatch = useDispatch<any>()
   useEffect(() => {
-    try {
-      const subscriber = auth().onAuthStateChanged(async (firebaseCurrentUser: FirebaseCurrentUserType) => {
-        if (firebaseCurrentUser?.displayName) {
-          const dispatched = await dispatch(fetchUser(firebaseCurrentUser.displayName))
-          // is firebase authenticated and registered
-          if (asyncThunkFullfiled(dispatched) && isValid(firebaseCurrentUser) && isValid(user)) navigation.navigate(ROUTES.HOME_SCREEN)
-          // is firebase authenticated but not registered
-          if (asyncThunkFullfiled(dispatched) && isValid(firebaseCurrentUser) && isValid(user) === false) navigation.navigate(ROUTES.REGISTER_SCREEN)
-        }
-      });
-      return subscriber; // unsubscribe on unmount
-    } catch (error) {
-      console.error(error)
-    }
+    const subscriber = auth().onAuthStateChanged(async (firebaseCurrentUser: FirebaseCurrentUserType) => {
+      if (firebaseCurrentUser?.displayName) {
+        const dispatched = await dispatch(fetchUser(firebaseCurrentUser.displayName))
+        // is firebase authenticated and registered
+        if (asyncThunkFullfiled(dispatched) && isValid(firebaseCurrentUser) && isValid(user)) navigation.navigate(ROUTES.HOME_SCREEN)
+        // is firebase authenticated but not registered
+        if (asyncThunkFullfiled(dispatched) && isValid(firebaseCurrentUser) && isValid(user) === false) navigation.navigate(ROUTES.REGISTER_SCREEN)
+      }
+    });
+    return subscriber; // unsubscribe on unmount
   }, []);
 
 

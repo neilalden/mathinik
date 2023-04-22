@@ -8,12 +8,14 @@ export type ActivityStateType = {
     loading: boolean
     error?: string
     activities: Array<ActivityType>;
+    currentActivity?: ActivityType
 }
 
 const initialState: ActivityStateType = {
     loading: false,
     error: '',
-    activities: []
+    activities: [],
+    currentActivity: undefined
 }
 
 export const addActivity = createAsyncThunk("activity/addActivity", (data: ActivityType) => {
@@ -74,9 +76,13 @@ export const ActivitySlice = createSlice({
         })
     },
     reducers: {
+        setCurrentActivity: (state, action: PayloadAction<ActivityType>) => {
+            const activity = action.payload;
+            state.currentActivity = activity
+        },
     }
 })
 
-export const { } = ActivitySlice.actions
+export const { setCurrentActivity } = ActivitySlice.actions
 
 export default ActivitySlice.reducer

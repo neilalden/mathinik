@@ -18,10 +18,11 @@ import { StateType } from '../services/redux/type';
 import { firebaseCurrentUser } from '../services/auth/googleSignIn';
 import { getTodos } from '../services/redux/slice/todo';
 import { getTodoColor, getTotalPoints } from '../common/utils/utility';
-import { QuizType, TodoType } from '../common/types';
+import { ActivityType, QuizType, TodoType } from '../common/types';
 import firestore from '@react-native-firebase/firestore';
 import { asyncThunkFullfiled, customTypeOf, isActivity, isLecture, isQuiz } from '../common/validation';
 import { setCurrentQuiz } from "../services/redux/slice/quiz"
+import { setCurrentActivity } from "../services/redux/slice/activity"
 import { getClassDetails } from '../services/redux/slice/class';
 const HomeScreen = (props) => {
   // to get current route name
@@ -95,7 +96,9 @@ const HomeScreen = (props) => {
       navigation.navigate(ROUTES.STUDENT_QUIZ_SCREEN);
     }
     else if (todoType === "activity") {
-      navigation.navigate(ROUTES.STUDENT_LESSON_SCREEN)
+      const activity: ActivityType = todo
+      dispatch(setCurrentActivity(activity))
+      navigation.navigate(ROUTES.STUDENT_ACTIVITY_SCREEN)
     }
   }
 

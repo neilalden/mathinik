@@ -3,6 +3,9 @@ import { QuizType, TodoType } from "../types";
 import DocumentPicker from 'react-native-document-picker';
 import { isActivity, isLecture, isQuiz } from "../validation";
 import { COLORS } from "./colors";
+import storage from '@react-native-firebase/storage';
+import RNFS from 'react-native-fs';
+import FileViewer from 'react-native-file-viewer';
 
 export const setStateEmptyString = (...setStates: Array<React.Dispatch<React.SetStateAction<string>>>) => {
     for (const setState of setStates) {
@@ -27,9 +30,13 @@ export const sortArrOfObj = (arr, order = "desc") => {
 
 
 export const getTotalPoints = (todo: TodoType): number => {
+    // @ts-ignore
     if (!!todo.pointsPerRight) {
+        // @ts-ignore
         return todo.pointsPerRight * todo.questions?.length
+        // @ts-ignore
     } else if (!!todo.points) {
+        // @ts-ignore
         return Number(todo.points)
     } else {
         return 0
@@ -76,6 +83,50 @@ export const openFile = (setFiles: React.Dispatch<React.SetStateAction<any[]>>) 
         })
         .catch(e => alert(`${e}`));
 };
+export const viewFile = (fileRef: string) => {
+    const dir = `${RNFS.DownloadDirectoryPath}/mathinik`;
+    const fileName = getFileName(fileRef);
+    const dirFile = dir + "/" + fileName;
+    RNFS.exists(dirFile).then(exists => {
+        if (exists) {
+            FileViewer.open(dirFile);
+        } else {
+            storage()
+                .ref(fileRef)
+                .getDownloadURL()
+                .then(url => {
+                    RNFS.exists(dir).then(
+                        res => {
+
+                            if (!res) {
+                                RNFS.mkdir(dir);
+                            }
+                            RNFS.downloadFile({
+                                fromUrl: url,
+                                toFile: dirFile,
+                            })
+                                .promise.then((x) => {
+                                    FileViewer.open(dirFile)
+                                })
+                                .then(() => { })
+                                .catch(error => {
+                                    console.error(error);
+                                });
+                        },
+                    ).catch(error => console.error(error))
+                })
+                .catch(error => console.error(error));
+        }
+    }).catch(error => console.error(error))
+}
+export const getFileName = (file: string) => {
+    try {
+        const split = file.split("/")
+        return split[split.length - 1]
+    } catch (error) {
+        console.error(error)
+    }
+}
 export const requestStoragePermission = async () => {
     try {
         const granted = await PermissionsAndroid.request(

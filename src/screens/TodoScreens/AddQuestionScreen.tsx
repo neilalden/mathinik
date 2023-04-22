@@ -80,7 +80,7 @@ const AddQuestionScreen = ({ route, navigation }: AddQuestionScreenParams) => {
           ToastAndroid.showWithGravity(
             'Quiz posted!',
             ToastAndroid.LONG,
-            ToastAndroid.CENTER,
+            ToastAndroid.BOTTOM,
           );
           navigation.navigate(ROUTES.HOME_SCREEN)
         } else {

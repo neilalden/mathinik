@@ -61,7 +61,7 @@ const Activities = ({
         ToastAndroid.showWithGravity(
           'Activity posted!',
           ToastAndroid.LONG,
-          ToastAndroid.CENTER,
+          ToastAndroid.BOTTOM,
         );
         navigation.navigate(ROUTES.HOME_SCREEN)
       } else {
@@ -296,6 +296,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 24,
     marginTop: 30,
+    height: 100
   },
   instructionsContainer: {
     position: 'absolute',

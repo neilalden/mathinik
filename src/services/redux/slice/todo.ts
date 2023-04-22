@@ -75,7 +75,7 @@ export const getTodos = createAsyncThunk("todo/getTodos", async (classId: ClassT
             pointsPerRight: doc.data().pointsPerRight,
             pointsPerWrong: doc.data().pointsPerWrong,
             questions: doc.data().questions,
-            topScorer: doc.data().topScorer
+            topScorer: doc.data().topScorer,
         }
         results.push(data);
     })
@@ -87,7 +87,7 @@ export const getTodos = createAsyncThunk("todo/getTodos", async (classId: ClassT
             closeOnDeadline: doc.data().closeOnDeadline,
             instructions: doc.data().instructions,
             points: doc.data().points,
-            files: doc.data().files,
+            filesRef: doc.data().filesRef,
         }
         results.push(data);
     });

@@ -3,7 +3,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { FirebaseCurrentUserType } from '../../common/types';
 
 GoogleSignin.configure({
-    webClientId: '1064310901179-31s1fp5ha4nesu037u4hoi1qm87lkv9p.apps.googleusercontent.com',
+    webClientId: '1064310901179-177j5ajscbfcb6kmmfvn41jgtl6cc9mu.apps.googleusercontent.com',
 });
 
 export const onGoogleButtonPress = async () => {

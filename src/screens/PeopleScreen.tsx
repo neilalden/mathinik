@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, ToastAndroid } from 'react-native';
 import React, { createRef, useRef, useState } from 'react';
 import Screen from '../components/Screen';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { StateType } from '../services/redux/type';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { addStudentToClass } from '../services/redux/slice/class';
-import { asyncThunkFullfiled, isValid } from '../common/validation';
+import { asyncThunkFailed, asyncThunkFullfiled, isValid } from '../common/validation';
 import Gap from '../components/Gap';
 
 const PeopleScreen = () => {
@@ -173,6 +173,14 @@ const PeopleScreen = () => {
                 if (asyncThunkFullfiled(dispatched)) {
                   setStudentId("")
                   refRBSheet.current.close();
+                } else if (asyncThunkFailed(dispatched)) {
+                  setStudentId("")
+                  refRBSheet.current.close();
+                  ToastAndroid.showWithGravity(
+                    'Failed to add student',
+                    ToastAndroid.LONG,
+                    ToastAndroid.BOTTOM,
+                  );
                 }
               }} />
           </View>
