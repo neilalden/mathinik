@@ -64,6 +64,7 @@ const StudentQuizScreen = (props) => {
             ToastAndroid.LONG,
             ToastAndroid.BOTTOM,
           );
+          navigation.navigate(ROUTES.HOME_SCREEN)
         }
       }
     })();

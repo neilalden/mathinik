@@ -16,7 +16,7 @@ const initialState: TodoStateType = {
     loading: false,
     error: '',
     todos: [],
-    submissions: []
+    submissions: [],
 }
 export type getSubmissionsPayloadType = {
     todos: Array<TodoType>
@@ -144,6 +144,7 @@ export const TodoSlice = createSlice({
         })
     },
     reducers: {
+
     }
 })
 

@@ -27,6 +27,15 @@ export const sortArrOfObj = (arr, order = "desc") => {
             : new Date(b["datePosted" || "deadline"]) - new Date(a["datePosted" || "deadline"]);
     });
 };
+export const sortArrayOfObjects = (arr, order = "desc", property) => {
+    return arr.sort((a: object, b: object) => {
+        return order === "desc"
+            // @ts-ignore
+            ? new Date(a[property]) - new Date(b[property])
+            // @ts-ignore
+            : new Date(b[property]) - new Date(a[property]);
+    });
+};
 
 
 export const getTotalPoints = (todo: TodoType): number => {

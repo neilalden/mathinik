@@ -12,6 +12,7 @@ import { StudentAccountType, TodoType } from '../common/types';
 import { asyncThunkFullfiled, customTypeOf } from '../common/validation';
 import { getTotalPoints } from '../common/utils/utility';
 import { getSubmissions } from '../services/redux/slice/todo';
+import { setRanking } from '../services/redux/slice/class';
 const GradesScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
@@ -24,6 +25,13 @@ const GradesScreen = () => {
   const [todos, setTodos] = useState<Array<string>>([]);
   const [students, setStudents] = useState<Array<StudentAccountType>>([])
   const [scores, setScores] = useState([]);
+  const [tempscores, tempsetScores] = useState({});
+  /*
+    student_id:{
+      quiz_id: num,
+      avg: num
+    }
+  */
   useEffect(() => {
     (async () => {
       const dispatched = await dispatch(getSubmissions({
@@ -31,34 +39,39 @@ const GradesScreen = () => {
         students: studentsState,
         classId: classId,
       }));
+      if (submissions && scores.length === 0) {
+        const Students = {};
+        const tempStudents = {}
+        submissions.map(_ => {
+          Students[_.id] = []
+          tempStudents[_.id] = {}
+        })
+        submissions.map(_ => {
+          Students[_.id].push(_.score ?? 0)
+          tempStudents[_.id][_.todoId] = _.score;
+        });
+        Object.keys(Students).map(key => {
+          setScores(prev => [...prev, Students[key]])
+        })
+        tempsetScores(tempStudents)
+        const dispatched = await dispatch(setRanking(tempStudents))
+      }
+      if (studentsState)
+        setStudents(studentsState)
+      if (todosState) {
+        const titles: string[] = []
+        titles.push("")
+        todosState.map(_ => {
+          const type = customTypeOf(_);
+          if (type !== "lecture") {
+            const todoPoints = getTotalPoints(_);
+            setTotalPoints(prev => prev + todoPoints)
+            titles.push(`${_.title}\n${todoPoints}`)
+          }
+        })
+        setTodos(titles)
+      }
     })();
-    if (submissions && scores.length === 0) {
-      const Students = {};
-      submissions.map(_ => {
-        Students[_.id] = []
-      })
-      submissions.map(_ => {
-        Students[_.id].push(_.score ?? 0)
-      });
-      Object.keys(Students).map(key => {
-        setScores(prev => [...prev, Students[key]])
-      })
-    }
-    if (studentsState)
-      setStudents(studentsState)
-    if (todosState) {
-      const titles: string[] = []
-      titles.push("")
-      todosState.map(_ => {
-        const type = customTypeOf(_);
-        if (type !== "lecture") {
-          const todoPoints = getTotalPoints(_);
-          setTotalPoints(prev => prev + todoPoints)
-          titles.push(`${_.title}\n${todoPoints}`)
-        }
-      })
-      setTodos(titles)
-    }
   }, []);
   return (
     <>

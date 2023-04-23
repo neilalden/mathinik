@@ -19,3 +19,10 @@ export const onGoogleButtonPress = async () => {
     return auth().signInWithCredential(googleCredential);
 }
 export const firebaseCurrentUser: FirebaseCurrentUserType = auth().currentUser;
+
+export const signOut = () => {
+    auth()
+        .signOut()
+        .then(() => GoogleSignin.signOut()
+        );
+}

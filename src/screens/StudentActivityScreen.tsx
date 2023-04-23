@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, ScrollView, TextInput, TouchableOpacity, ToastAndroid } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from '../components/Icon';
 import { IMAGES } from '../common/images';
@@ -8,19 +8,96 @@ import { COLORS } from '../common/utils/colors';
 import { Button } from '../components/Buttons';
 import { ROUTES } from '../common/routes';
 import { StateType } from '../services/redux/type';
-import { useSelector } from 'react-redux';
-import Gap from '../components/Gap';
+import { useDispatch, useSelector } from 'react-redux';
 import { getFileName, viewFile } from '../common/utils/utility';
+import { asyncThunkFullfiled, isValid } from '../common/validation';
+import { getActivitySubmission, gradeStudentActivity, submitActivity } from '../services/redux/slice/activity';
+import { SubmitActivityGradeType, SubmitActivityType } from '../common/types';
 
 
-const StudentLessonScreen = () => {
+const StudentLessonScreen = (props) => {
   const route = useRoute();
-  const navigation = useNavigation();
+  const navigation = props.navigation
+  const dispatch = useDispatch()
+  const User = useSelector((state: StateType) => state.User.user);
   const Activity = useSelector((state: StateType) => state.Activity.currentActivity);
-  const [answer, setAnswer] = useState("")
-  const handleOnPress = () => {
-    navigation.goBack();
+  const [answer, setAnswer] = useState("");
+  const [grade, setGrade] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      const dispatched = await dispatch(getActivitySubmission({
+        studentId: User?.id,
+        classId: User?.classId,
+        activityId: Activity?.id
+      }));
+    })();
+  }, [])
+
+  const handleOnPress = async () => {
+    if (!User || !Activity) return;
+    if (!isValid(answer)) {
+      ToastAndroid.showWithGravity(
+        'Enter your answer',
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM,
+      );
+      return;
+    }
+    const data: SubmitActivityType = {
+      payload: {
+        answer,
+        createdAt: new Date(),
+        id: User.id,
+        name: User.fullname,
+        photoURL: User.photoURL,
+        score: null
+      },
+      classId: String(User.classId),
+      activityId: Activity.id
+    }
+    setAnswer("")
+    const dispatched = await dispatch(submitActivity(data))
+    if (asyncThunkFullfiled(dispatched)) {
+      ToastAndroid.showWithGravity(
+        'Activity answered!',
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM,
+      );
+      navigation.navigate(ROUTES.HOME_SCREEN)
+    }
   };
+
+  const handleEnterGrade = async () => {
+    const valid = isValid(Number(grade))
+    if (!isValid(valid)) {
+      ToastAndroid.showWithGravity(
+        'Enter proper grade',
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM,
+      );
+      return;
+    }
+    if (Activity.points && Number(grade) > Activity.points) {
+      ToastAndroid.showWithGravity(
+        'Enter proper grade',
+        ToastAndroid.LONG,
+        ToastAndroid.BOTTOM,
+      );
+      return;
+    }
+    const data: SubmitActivityGradeType = {
+      score: Number(grade),
+      classId: String(User.classId),
+      studentId: Activity?.studentId,
+      activityId: Activity.id
+    }
+    const dispatched = await dispatch(gradeStudentActivity(data))
+    if (asyncThunkFullfiled(dispatched)) {
+      console.log(dispatched)
+      navigation.goBack();
+    }
+  }
   const handleBack = () => {
     navigation.goBack();
   };
@@ -82,25 +159,51 @@ const StudentLessonScreen = () => {
           )
         })}
 
+      {Activity?.score ? <Text style={{ color: '#000', fontSize: 20, fontWeight: 'bold', textAlign: "center" }}>{`${Activity.score}/${Activity.points}`}</Text> : null}
       <View
-        style={styles.instructionsCard}>
+        style={Activity?.answer ? styles.answeredCard : styles.instructionsCard}>
         <View
           style={styles.instructionsContainer}>
           <Text style={styles.textInputtitle}>
-            Your answer
+            {User?.isTeacher ? `${Activity.name}'s answer` : "Your answer"}
           </Text>
         </View>
         <View style={{ marginLeft: 6, paddingTop: 12 }}>
-          <TextInput multiline={true} style={{ fontSize: 16 }} value={answer} onChangeText={(text) => setAnswer(text)} />
+          <TextInput multiline={true} style={{ fontSize: 16 }} value={Activity.answer || answer} onChangeText={(text) => setAnswer(text)} />
         </View>
       </View>
-      <Button
-        text={'Submit'}
-        gradientColor={[COLORS.LIGHTGREEN, COLORS.MIDGREEN, COLORS.GREENNORMAL]}
-        textStyle={{ paddingHorizontal: 20 }}
-        containerStyle={{ marginHorizontal: 16, marginVertical: 10 }}
-        onPress={handleOnPress}
-      />
+      {!Activity.answer ?
+        <Button
+          text={'Submit'}
+          gradientColor={[COLORS.LIGHTGREEN, COLORS.MIDGREEN, COLORS.GREENNORMAL]}
+          textStyle={{ paddingHorizontal: 20 }}
+          containerStyle={{ marginHorizontal: 16, marginVertical: 10 }}
+          onPress={handleOnPress}
+        /> : null}
+      {User?.isTeacher ?
+        <>
+          <View
+            style={styles.gradeCard}>
+            <View
+              style={styles.instructionsContainer}>
+              <Text style={styles.textInputtitle}>
+                Grade student {`(upto ${Activity.points} points)`}
+              </Text>
+            </View>
+            <View style={{ marginLeft: 6, paddingTop: 12 }}>
+              <TextInput style={{ fontSize: 16 }} value={grade} onChangeText={(text) => setGrade(text)} />
+            </View>
+          </View>
+          <Button
+            text={'Submit'}
+            gradientColor={[COLORS.LIGHTGREEN, COLORS.MIDGREEN, COLORS.GREENNORMAL]}
+            textStyle={{ paddingHorizontal: 20 }}
+            containerStyle={{ marginHorizontal: 16, }}
+            onPress={handleEnterGrade}
+          />
+        </>
+
+        : null}
     </ScrollView>
   );
 };
@@ -111,6 +214,23 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderWidth: 1,
     borderColor: '#00CC66',
+    borderRadius: 16,
+    marginBottom: 16,
+    marginTop: 30,
+    height: 100
+  },
+  gradeCard: {
+    backgroundColor: 'white',
+    marginHorizontal: 16,
+    borderWidth: 1,
+    borderColor: '#00CC66',
+    borderRadius: 16,
+    marginBottom: 16,
+    height: 60
+  },
+  answeredCard: {
+    backgroundColor: 'white',
+    marginHorizontal: 16,
     borderRadius: 16,
     marginBottom: 24,
     marginTop: 30,

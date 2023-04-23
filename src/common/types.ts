@@ -92,10 +92,11 @@ export type setStateNumber = React.Dispatch<React.SetStateAction<number>>
 
 export type ActivitySubmission = {
     answer: string;
-    score: number;
+    score: number | null;
     createdAt: Date;
     id: StudentAccountType["id"];
-    name: StudentAccountType["fullname"]
+    name: StudentAccountType["fullname"];
+    photoURL?: StudentAccountType["photoURL"]
 }
 
 export type QuizSubmission = {
@@ -115,7 +116,18 @@ export type SubmitQuizType = {
     classId: TeacherAccountType["id"];
     quizId: QuizType["id"]
 }
+export type SubmitActivityType = {
+    payload: ActivitySubmission;
+    classId: TeacherAccountType["id"];
+    activityId: AccountType["id"]
+}
 
+export type SubmitActivityGradeType = {
+    score: ActivitySubmission["score"]
+    classId: TeacherAccountType["id"];
+    activityId: AccountType["id"];
+    studentId: StudentAccountType["id"]
+}
 export type RankingItem = {
     student: StudentAccountType;
     points: number

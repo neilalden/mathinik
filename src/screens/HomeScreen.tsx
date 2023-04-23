@@ -1,6 +1,8 @@
 import {
   StyleSheet, Text, Image, View, TouchableOpacity
-  , ScrollView
+  , ScrollView,
+  Alert,
+  BackHandler
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import Screen from '../components/Screen';
@@ -15,21 +17,27 @@ import BottomNav from '../components/BottomNav';
 import { getPeriodOfDay } from '../common/utils/time';
 import { useDispatch, useSelector } from 'react-redux';
 import { StateType } from '../services/redux/type';
-import { firebaseCurrentUser } from '../services/auth/googleSignIn';
+import { firebaseCurrentUser, signOut } from '../services/auth/googleSignIn';
 import { getTodos } from '../services/redux/slice/todo';
 import { getTodoColor, getTotalPoints } from '../common/utils/utility';
-import { ActivityType, QuizType, TodoType } from '../common/types';
+import { ActivitySubmission, ActivityType, FirebaseCurrentUserType, QuizType, TodoType } from '../common/types';
 import firestore from '@react-native-firebase/firestore';
-import { asyncThunkFullfiled, customTypeOf, isActivity, isLecture, isQuiz } from '../common/validation';
+import { asyncThunkFullfiled, customTypeOf, isActivity, isLecture, isQuiz, isValid } from '../common/validation';
 import { setCurrentQuiz } from "../services/redux/slice/quiz"
-import { setCurrentActivity } from "../services/redux/slice/activity"
+import { getActivitySubmissions, setCurrentActivity } from "../services/redux/slice/activity"
 import { getClassDetails } from '../services/redux/slice/class';
+import auth from "@react-native-firebase/auth";
+import { fetchUser } from '../services/redux/slice/user';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import Gap from '../components/Gap';
+
 const HomeScreen = (props) => {
   // to get current route name
   const route = useRoute();
   // to navigate pages
   const taskcompleted = 80;
-  const navigation = props.navigation;
+  const refRBSheet = useRef();
+  const navigation = useNavigation();
   const dispatch = useDispatch<any>()
   const user = useSelector((state: StateType) => state.User.user)
   const submissions = useSelector((state: StateType) => state.Todo.submissions);
@@ -37,6 +45,22 @@ const HomeScreen = (props) => {
   const displayName = String(user?.fullname).split(" ").slice(0, 2).join(" ");
   const classDetails = useSelector((state: StateType) => state.Class?.classDetails);
   const [hasAnswered, setHasAnswered] = useState(0);
+  const [activityAnswers, setActivityAnswers] = useState<Array<ActivitySubmission & ActivityType>>([])
+  const [selectedActivity, setSelectedActivity] = useState<ActivitySubmission & ActivityType>()
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(async (firebaseCurrentUser: FirebaseCurrentUserType) => {
+      if (!firebaseCurrentUser) navigation.navigate(ROUTES.LANDING_SCREEN)
+      if (firebaseCurrentUser?.displayName) {
+        const dispatched = await dispatch(fetchUser(firebaseCurrentUser.displayName))
+        // is firebase authenticated and registered
+        if (asyncThunkFullfiled(dispatched) && isValid(firebaseCurrentUser) && isValid(user)) navigation.navigate(ROUTES.HOME_SCREEN)
+        // is firebase authenticated but not registered
+        if (asyncThunkFullfiled(dispatched) && isValid(firebaseCurrentUser) && isValid(user) === false) navigation.navigate(ROUTES.REGISTER_SCREEN)
+      }
+    });
+    return subscriber; // unsubscribe on unmount
+  }, []);
   useEffect(() => {
     if (submissions && hasAnswered !== 0) {
       let num = 0
@@ -83,12 +107,23 @@ const HomeScreen = (props) => {
       }
     })();
   }, [user?.id]);
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        navigation.navigate(ROUTES.HOME_SCREEN)
+        return true
+      },
+    );
+
+    return () => backHandler.remove();
+  }, [])
 
 
   const handleOnPress = async () => {
     navigation.navigate(ROUTES.CREATE_TODO_SCREEN);
   };
-  const handleOpenTodo = (todo: TodoType) => {
+  const handleOpenTodo = async (todo: TodoType) => {
     const todoType = customTypeOf(todo);
     if (todoType === "quiz") {
       const quiz: QuizType = todo
@@ -97,9 +132,36 @@ const HomeScreen = (props) => {
     }
     else if (todoType === "activity") {
       const activity: ActivityType = todo
+
+      if (user.isTeacher) {
+        const x = await getActivitySubmissions({ classId: classDetails?.classId, activityId: todo.id })
+        setActivityAnswers(x)
+        setSelectedActivity(activity)
+        refRBSheet.current.open()
+        return;
+      }
+
       dispatch(setCurrentActivity(activity))
       navigation.navigate(ROUTES.STUDENT_ACTIVITY_SCREEN)
     }
+  }
+  const openActivitySubmission = (index: number) => {
+    const activity: ActivitySubmission = activityAnswers[index];
+    dispatch(setCurrentActivity({ ...activity, ...selectedActivity, studentId: activity.id, id: selectedActivity?.id }))
+
+    refRBSheet.current.close()
+    navigation.navigate(ROUTES.STUDENT_ACTIVITY_SCREEN)
+  }
+
+  const handleLogout = () => {
+    Alert.alert('', 'Logout?', [
+      {
+        text: 'yes',
+        onPress: () => signOut(),
+        style: 'cancel',
+      },
+      { text: 'No', onPress: () => false },
+    ]);
   }
 
 
@@ -113,6 +175,7 @@ const HomeScreen = (props) => {
             <Text
               style={styles.headerGreetText}>{`${getPeriodOfDay()}\n${displayName}`}</Text>
             <Icon
+              onPress={handleLogout}
               source={{ uri: user?.photoURL }}
               size={80}
               imageStyle={styles.profilePicture}
@@ -131,7 +194,7 @@ const HomeScreen = (props) => {
             </View>
           </LinearGradient>
 
-          <View style={{ marginTop: 40, marginHorizontal: 30, flexDirection: "row", justifyContent: "space-between" }}>
+          <View style={{ marginTop: 40, marginHorizontal: 16, flexDirection: "row", justifyContent: "space-between" }}>
             <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#000000' }}>
               TODO
             </Text>
@@ -142,7 +205,7 @@ const HomeScreen = (props) => {
             todos.length > 0 ?
               todos.map((todo: TodoType, i) => {
                 const color = getTodoColor(todo)
-                const points = getTotalPoints(todo)
+                const points = getTotalPoints(todo);
                 return (
                   <TouchableOpacity key={i} onPress={() => handleOpenTodo(todo)}>
                     <LinearGradient
@@ -180,6 +243,42 @@ const HomeScreen = (props) => {
                 No options added yet.
               </Text>
           }
+          <RBSheet
+            ref={refRBSheet}
+            closeOnDragDown={true}
+            closeOnPressMask={false}
+            customStyles={{
+              wrapper: {
+                backgroundColor: "rgba(0,0,0, .50)"
+              },
+              draggableIcon: {
+                backgroundColor: "#000"
+              },
+              container: styles.sheetContainer
+            }}
+          >
+            <ScrollView style={styles.sheetContainer}>
+              <Text style={[styles.text, { margin: 20, textAlign: "center", fontWeight: "bold" }]}>Submissions</Text>
+              {activityAnswers && activityAnswers.map((student, _) => {
+                return <TouchableOpacity key={_} style={styles.textContainer} onPress={() => openActivitySubmission(_)}>
+                  <Text
+                    style={styles.text}>
+                    {student.name}
+                  </Text>
+                  <View style={{ borderRadius: 100 }}>
+                    <Icon
+                      imageStyle={{
+                        borderRadius: 100,
+                        backgroundColor: 'gray',
+                      }}
+                      source={{ uri: student.photoURL }}
+                      size={30}
+                    />
+                  </View>
+                </TouchableOpacity>
+              })}
+            </ScrollView>
+          </RBSheet>
         </ScrollView>
         <BottomNav routeName={route.name} navigation={navigation} />
       </>
@@ -192,7 +291,8 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
-    margin: 30,
+    marginVertical: 30,
+    marginHorizontal: 16,
     justifyContent: 'space-between',
   },
   headerGreetText: {
@@ -206,7 +306,7 @@ const styles = StyleSheet.create({
   },
   jumbotron: {
     flexDirection: 'row',
-    marginHorizontal: 30,
+    marginHorizontal: 16,
     alignItems: 'center',
     padding: 20,
     borderRadius: 26,
@@ -217,7 +317,7 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     flexDirection: 'row',
-    marginHorizontal: 30,
+    marginHorizontal: 16,
     marginTop: 12,
     justifyContent: 'space-between',
     padding: 20,
@@ -242,5 +342,24 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 14,
     textAlign: "right"
-  }
+  },
+  sheetContainer: {
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    height: "80%",
+  },
+  textContainer: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    alignItems: 'center',
+    width: '80%',
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: "#00cc66",
+    borderRadius: 16,
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    marginBottom: 10,
+  },
+  text: { fontSize: 20, fontWeight: '500', color: COLORS.BLACK },
 });

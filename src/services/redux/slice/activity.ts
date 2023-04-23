@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { FirebaseCurrentUserType, QuestionType, ActivityType } from "../../../common/types";
+import { FirebaseCurrentUserType, QuestionType, ActivityType, SubmitActivityType, StudentAccountType, ClassType, ActivitySubmission, SubmitActivityGradeType } from "../../../common/types";
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
@@ -8,7 +8,13 @@ export type ActivityStateType = {
     loading: boolean
     error?: string
     activities: Array<ActivityType>;
-    currentActivity?: ActivityType
+    currentActivity?: ActivityType | ActivitySubmission
+}
+
+export type getActivitySubmissionType = {
+    studentId: StudentAccountType["id"];
+    classId: ClassType["classId"];
+    activityId: ActivityType["id"]
 }
 
 const initialState: ActivityStateType = {
@@ -38,7 +44,8 @@ export const addActivity = createAsyncThunk("activity/addActivity", (data: Activ
                         delete data.files
                         return firestore()
                             .collection(`Classes/${path}/activities`)
-                            .add(data)
+                            .doc(data.id)
+                            .set(data)
                             .then(() => "success")
                             .catch(error => console.error(error));
                     }
@@ -57,6 +64,40 @@ export const addActivity = createAsyncThunk("activity/addActivity", (data: Activ
     }
 })
 
+export const submitActivity = createAsyncThunk("activity/submitActivity", (data: SubmitActivityType) => {
+    const firebaseCurrentUser: FirebaseCurrentUserType = auth().currentUser;
+    if (firebaseCurrentUser?.displayName)
+        return firestore().collection(`Classes/${data.classId}/activities/${data.activityId}/submissions`).doc(firebaseCurrentUser?.displayName).set(data.payload).then(() => "success").catch((error) => error)
+})
+
+export const gradeStudentActivity = createAsyncThunk("activity/gradeStudentActivity", (data: SubmitActivityGradeType) => {
+    const firebaseCurrentUser: FirebaseCurrentUserType = auth().currentUser;
+    if (firebaseCurrentUser?.displayName)
+        return firestore().collection(`Classes/${data.classId}/activities/${data.activityId}/submissions`).doc(data.studentId).update({ score: data.score }).then(() => "success").catch((error) => error)
+})
+
+export const getActivitySubmission = createAsyncThunk("activity/getActivitySubmission", (data: getActivitySubmissionType) => {
+    return firebaseGetActivitySubmission(data)
+})
+export const getActivitySubmissions = async (data: { classId: ClassType["classId"], activityId: ActivityType["id"] }) => {
+    try {
+        const querySnapshot = await firestore().collection(`Classes/${data.classId}/activities/${data.activityId}/submissions`).get().then((querySnapshot) => querySnapshot);
+        const arr = []
+        querySnapshot.forEach(doc => {
+            arr.push(doc.data())
+        })
+        return arr;
+
+    } catch (error) {
+        console.error(error)
+    }
+};
+
+export const firebaseGetActivitySubmission = (data: getActivitySubmissionType) => {
+    const firebaseCurrentUser: FirebaseCurrentUserType = auth().currentUser;
+    if (firebaseCurrentUser?.displayName)
+        return firestore().collection(`Classes/${data.classId}/activities/${data.activityId}/submissions`).doc(firebaseCurrentUser?.displayName).get().then((doc) => doc.data()).catch((error) => error)
+}
 
 export const ActivitySlice = createSlice({
     name: "activity",
@@ -71,6 +112,42 @@ export const ActivitySlice = createSlice({
             state.error = ""
         })
         builder.addCase(addActivity.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.error.message
+        })
+
+        builder.addCase(submitActivity.pending, (state) => {
+            state.loading = true
+        })
+        builder.addCase(submitActivity.fulfilled, (state, action: PayloadAction<ActivityType>) => {
+            state.loading = false
+            state.currentActivity = action.payload
+            state.error = ""
+        })
+        builder.addCase(submitActivity.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.error.message
+        })
+
+        builder.addCase(getActivitySubmission.fulfilled, (state, action: PayloadAction<ActivitySubmission>) => {
+            state.loading = false
+            state.currentActivity = { ...state.currentActivity, ...action.payload }
+            state.error = ""
+        })
+        builder.addCase(getActivitySubmission.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.error.message
+        })
+
+        builder.addCase(gradeStudentActivity.pending, (state) => {
+            state.loading = true
+        })
+        builder.addCase(gradeStudentActivity.fulfilled, (state, action: PayloadAction<ActivityType>) => {
+            state.loading = false
+            state.currentActivity = action.payload
+            state.error = ""
+        })
+        builder.addCase(gradeStudentActivity.rejected, (state, action) => {
             state.loading = false
             state.error = action.error.message
         })

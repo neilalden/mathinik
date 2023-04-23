@@ -9,12 +9,14 @@ export type ClassStateType = {
     loading: boolean
     error?: string
     classDetails?: ClassType
+    ranking: any
 }
 
 const initialState: ClassStateType = {
     loading: false,
     error: '',
-    classDetails: undefined
+    classDetails: undefined,
+    ranking: undefined
 }
 
 export const getClassDetails = createAsyncThunk("class/getQuiz", (classId: AccountType["classId"]) => {
@@ -72,9 +74,12 @@ export const ClassSlice = createSlice({
         })
     },
     reducers: {
+        setRanking: (state, action: PayloadAction<any>) => {
+            state.ranking = action.payload
+        },
     }
 })
 
-export const { } = ClassSlice.actions
+export const { setRanking } = ClassSlice.actions
 
 export default ClassSlice.reducer

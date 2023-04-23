@@ -1,7 +1,5 @@
 import { Text, View, StyleSheet, ScrollView } from 'react-native';
 import React, { useEffect, useState, } from 'react';
-import Screen from '../components/Screen';
-import { useRoute } from '@react-navigation/native';
 import Icon from '../components/Icon';
 import { Button } from '../components/Buttons';
 import { COLORS } from '../common/utils/colors';
@@ -17,7 +15,6 @@ import AwesomeAlert from 'react-native-awesome-alerts';
 import { isValid } from '../common/validation';
 import { setStateEmptyString } from '../common/utils/utility';
 import auth from "@react-native-firebase/auth";
-import { unwrapResult } from '@reduxjs/toolkit';
 import { asyncThunkFullfiled } from '../common/validation';
 
 

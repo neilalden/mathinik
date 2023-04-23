@@ -200,7 +200,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
     borderRadius: 16,
     paddingBottom: 20,
-  }, title: {
+  },
+  title: {
     fontSize: 28,
     fontWeight: '800',
     textTransform: 'uppercase',
