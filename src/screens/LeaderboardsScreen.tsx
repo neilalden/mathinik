@@ -9,34 +9,59 @@ import { Button } from '../components/Buttons';
 import { ROUTES } from '../common/routes';
 import LinearGradient from 'react-native-linear-gradient';
 import BottomNav from '../components/BottomNav';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { StateType } from '../services/redux/type';
 import { sortArrOfObj, sortArrayOfObjects } from '../common/utils/utility';
+import { getSubmissions } from '../services/redux/slice/todo';
+import { setRanking } from '../services/redux/slice/class';
 const LeaderboardsScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
+  const dispatch = useDispatch()
   const User = useSelector((state: StateType) => state.User.user)
   const classDetails = useSelector((state: StateType) => state.Class.classDetails)
   const ranking = useSelector((state: StateType) => state.Class.ranking)
+  const submissions = useSelector((state: StateType) => state.Todo.submissions);
   const [arr, setArr] = useState([])
   const taskcompleted = 90;
-  const score = 70;
-  const name = 'Mathinik student';
 
   useEffect(() => {
-    const temp = (classDetails?.students.map(student => {
-      const keys = Object.keys(ranking[student.id]);
-      let score = 0;
-      for (const key of keys) {
-        score += (ranking[student.id][key])
-      }
-      score = score
-      return {
-        score: score,
-        ...student,
-      }
-    }))
-    setArr(sortArrayOfObjects(temp, "asc", "score"))
+    if (!ranking) {
+      (async () => {
+        const dispatched = await dispatch(getSubmissions({
+          todos: todosState,
+          students: studentsState,
+          classId: classId,
+        }));
+        if (submissions) {
+          const Students = {};
+          const tempStudents = {}
+          submissions.map(_ => {
+            Students[_.id] = []
+            tempStudents[_.id] = {}
+          })
+          submissions.map(_ => {
+            Students[_.id].push(_.score ?? 0)
+            tempStudents[_.id][_.todoId] = _.score;
+          });
+          const dispatched = await dispatch(setRanking(tempStudents))
+        }
+      })();
+    } else {
+      const temp = (classDetails?.students.map(student => {
+        const keys = Object.keys(ranking[student.id]);
+        let score = 0;
+        for (const key of keys) {
+          score += (ranking[student.id][key])
+        }
+        score = score
+        return {
+          score: score,
+          ...student,
+        }
+      }))
+      setArr(sortArrayOfObjects(temp, "asc", "score"))
+    }
   }, [])
   return (
     <>

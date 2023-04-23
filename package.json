@@ -12,6 +12,7 @@
     "assemble-release": "cd android && .\\gradlew assembleRelease && cd ..",
     "assemble-debug": "cd android && .\\gradlew assembleDebug && cd ..",
     "apk": "cd android && .\\gradlew assembleRelease && cd ..",
+    "bpk": "cd android && .\\gradlew assembleDebug && cd ..",
     "aab": "cd android && .\\gradlew bundleRelease && cd ..",
     "android-reconnect": "adb reverse tcp:8081 tcp:8081",
     "android": "react-native run-android",
