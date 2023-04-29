@@ -13,9 +13,9 @@ const App = () => {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
           {
-            title: 'Mathinik Storage Permission',
+            title: 'Math-Galing Storage Permission',
             message:
-              'Mathinik needs access to your storage ' +
+              'Math-Galing needs access to your storage ' +
               'so you can upload files from your storage',
             buttonNeutral: 'Ask Me Later',
             buttonNegative: 'Cancel',
@@ -27,9 +27,9 @@ const App = () => {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
           {
-            title: 'Mathinik Storage Permission',
+            title: 'Math-Galing Storage Permission',
             message:
-              'Mathinik needs access to your storage ' +
+              'Math-Galing needs access to your storage ' +
               'so you can save files to your storage',
             buttonNeutral: 'Ask Me Later',
             buttonNegative: 'Cancel',

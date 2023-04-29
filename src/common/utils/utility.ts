@@ -1,4 +1,4 @@
-import { PermissionsAndroid } from "react-native";
+import { PermissionsAndroid, ToastAndroid } from "react-native";
 import { QuizType, TodoType } from "../types";
 import DocumentPicker from 'react-native-document-picker';
 import { isActivity, isLecture, isQuiz } from "../validation";
@@ -57,6 +57,11 @@ export const openFile = (setFiles: React.Dispatch<React.SetStateAction<any[]>>) 
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
     )
         .then(async response => {
+            ToastAndroid.showWithGravity(
+                'Loading...',
+                ToastAndroid.LONG,
+                ToastAndroid.BOTTOM,
+            );
             if (response) {
                 DocumentPicker.pickMultiple({
                     type: [DocumentPicker.types.allFiles],
@@ -98,6 +103,12 @@ export const viewFile = (fileRef: string) => {
     const dirFile = dir + "/" + fileName;
     RNFS.exists(dirFile).then(exists => {
         if (exists) {
+
+            ToastAndroid.showWithGravity(
+                'Loading...',
+                ToastAndroid.LONG,
+                ToastAndroid.BOTTOM,
+            );
             FileViewer.open(dirFile);
         } else {
             storage()
@@ -106,6 +117,11 @@ export const viewFile = (fileRef: string) => {
                 .then(url => {
                     RNFS.exists(dir).then(
                         res => {
+                            ToastAndroid.showWithGravity(
+                                'Loading...',
+                                ToastAndroid.LONG,
+                                ToastAndroid.BOTTOM,
+                            );
 
                             if (!res) {
                                 RNFS.mkdir(dir);
@@ -115,6 +131,7 @@ export const viewFile = (fileRef: string) => {
                                 toFile: dirFile,
                             })
                                 .promise.then((x) => {
+
                                     FileViewer.open(dirFile)
                                 })
                                 .then(() => { })
@@ -181,4 +198,7 @@ text, and PDF files. Any other file types would  require
  students to have the necessary application to open 
 them.`
 
-export const getTodoColor = (todo: TodoType) => isLecture(todo) ? [COLORS.LIGHTBLUE, COLORS.MIDBLUE, COLORS.BLUENORMAL] : isActivity(todo) ? [COLORS.LIGHTORANGE, COLORS.ORANGE, COLORS.DARKORANGE] : isQuiz(todo) ? [COLORS.LIGHTPINK, COLORS.PINK, COLORS.DARKPINK] : [COLORS.DARKPINK, COLORS.PINK, COLORS.LIGHTPINK]
+export const getTodoColor = (todo: TodoType) => !!todo.datePosted ? [COLORS.LIGHTBLUE, COLORS.MIDBLUE, COLORS.BLUENORMAL] : isActivity(todo) ? [COLORS.LIGHTORANGE, COLORS.ORANGE, COLORS.DARKORANGE] : isQuiz(todo) ? [COLORS.LIGHTPINK, COLORS.PINK, COLORS.DARKPINK] : [COLORS.DARKPINK, COLORS.PINK, COLORS.LIGHTPINK]
+export const truncate = (str, n = 23) => {
+    return (str.length > n) ? str.substring(0, n) + "..." : str;
+};

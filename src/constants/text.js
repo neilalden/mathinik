@@ -1,1 +1,1 @@
-export const APP_NAME = 'MATHINIK';
+export const APP_NAME = 'Math-Galing';

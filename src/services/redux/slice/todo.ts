@@ -51,6 +51,16 @@ export const getSubmissions = createAsyncThunk("todo/getSubmissions", async (pay
         return submissions
     }
 })
+export type deleteTodoType = {
+    classId: ClassType["classId"];
+    todoId: TodoType["id"];
+    todoType: "quizes" | "activities"
+}
+export const deleteTodo = createAsyncThunk("todo/deleteTodo", async (payload: deleteTodoType) => {
+    console.log(payload)
+
+    return await firestore().collection(`Classes/${payload.classId}/${payload.todoType}`).doc(payload.todoId).delete().then(() => "success").catch(error => console.error(error))
+})
 
 export const getTodos = createAsyncThunk("todo/getTodos", async (classId: ClassType["classId"]) => {
     const firebaseCurrentUser: FirebaseCurrentUserType = auth().currentUser;
@@ -98,6 +108,9 @@ export const getTodos = createAsyncThunk("todo/getTodos", async (classId: ClassT
             instructions: doc.data().instructions,
             datePosted: doc.data().datePosted?.toDate(),
             files: doc.data().files,
+            filesRef: doc.data().filesRef,
+            deadline: doc.data().datePosted?.toDate(),
+
         }
         results.push(data);
     });
@@ -121,6 +134,21 @@ export const TodoSlice = createSlice({
             }
         })
         builder.addCase(getTodos.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.error.message
+        })
+
+
+        builder.addCase(deleteTodo.pending, (state) => {
+            state.loading = true
+        })
+        builder.addCase(deleteTodo.fulfilled, (state, action) => {
+            state.loading = false
+            if (!action.payload) {
+                state.error = "Error: Payload undefined"
+            }
+        })
+        builder.addCase(deleteTodo.rejected, (state, action) => {
             state.loading = false
             state.error = action.error.message
         })

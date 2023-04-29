@@ -31,6 +31,7 @@ export type LectureType = {
     title: string;
     instructions: string;
     datePosted: Date;
+    deadline: Date;
     files?: Array<File & FileType>;
     filesRef?: Array<string>;
     pointsPerRight?: undefined;
@@ -105,6 +106,7 @@ export type QuizSubmission = {
     createdAt: Date;
     id: StudentAccountType["id"];
     name: StudentAccountType["fullname"]
+    photoUrl: StudentAccountType["photoURL"]
 }
 export type QuizAnswer = {
     question: QuestionType["question"];

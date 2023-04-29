@@ -26,26 +26,37 @@ const initialState: QuizStateType = {
     currentQuiz: undefined
 }
 
-export const addQuiz = createAsyncThunk("quiz/addQuiz", (data: QuizType) => {
+export const addQuiz = createAsyncThunk("quiz/addQuiz", async (data: QuizType) => {
     const firebaseCurrentUser: FirebaseCurrentUserType = auth().currentUser;
     return firestore().collection(`Classes/${firebaseCurrentUser?.displayName}/quizes`).doc(data.id).set(data).then(() => "success").catch((error) => error)
 });
 
 
-export const submitQuiz = createAsyncThunk("quiz/submitQuiz", (data: SubmitQuizType) => {
+export const submitQuiz = createAsyncThunk("quiz/submitQuiz", async (data: SubmitQuizType) => {
     const firebaseCurrentUser: FirebaseCurrentUserType = auth().currentUser;
     if (firebaseCurrentUser?.displayName)
         return firestore().collection(`Classes/${data.classId}/quizes/${data.quizId}/submissions`).doc(firebaseCurrentUser?.displayName).set(data.payload).then(() => "success").catch((error) => error)
 })
 
-export const getQuizSubmission = createAsyncThunk("quiz/getQuizSubmission", (data: getQuizSubmissionType) => {
-    return firebaseGetQuizSubmission(data)
+export const getQuizSubmission = createAsyncThunk("quiz/getQuizSubmission", async (data: getQuizSubmissionType) => {
+    return await firebaseGetQuizSubmission(data)
 })
+export const getQuizSubmissions = async (data: { classId: ClassType["classId"], quizId: QuizType["id"] }) => {
+    try {
+        const querySnapshot = await firestore().collection(`Classes/${data.classId}/quizes/${data.quizId}/submissions`).get().then((querySnapshot) => querySnapshot);
+        const arr = []
+        // @ts-ignore
+        querySnapshot.forEach(doc => arr.push(doc.data()))
+        return arr;
 
-export const firebaseGetQuizSubmission = (data: getQuizSubmissionType) => {
+    } catch (error) {
+        console.error(error)
+    }
+};
+
+export const firebaseGetQuizSubmission = async (data: getQuizSubmissionType) => {
     const firebaseCurrentUser: FirebaseCurrentUserType = auth().currentUser;
-    if (firebaseCurrentUser?.displayName)
-        return firestore().collection(`Classes/${data.classId}/quizes/${data.quizId}/submissions`).doc(firebaseCurrentUser?.displayName).get().then((doc) => doc.data()).catch((error) => error)
+    return await firestore().collection(`Classes/${data.classId}/quizes/${data.quizId}/submissions`).doc(data.studentId).get().then((doc) => doc.data()).catch((error) => error)
 }
 
 export const QuizSlice = createSlice({

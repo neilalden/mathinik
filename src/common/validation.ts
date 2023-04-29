@@ -113,6 +113,7 @@ export const isLecture = (todo: TodoType): todo is LectureType => {
     files: [],
     filesRef: [],
     datePosted: new Date(),
+    deadline: new Date(),
     topScorer: {
       student: {
         id: "",
@@ -134,8 +135,8 @@ export const isLecture = (todo: TodoType): todo is LectureType => {
 }
 
 export const customTypeOf = (arg: any) => {
-  if (isActivity(arg)) return "activity";
   if (isLecture(arg)) return "lecture";
+  if (isActivity(arg)) return "activity";
   if (isQuiz(arg)) return "quiz";
   return undefined
 }

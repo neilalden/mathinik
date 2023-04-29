@@ -16,7 +16,7 @@ import { getFileName, viewFile } from '../common/utils/utility';
 const StudentLessonScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const Activity = useSelector((state: StateType) => state.Activity.currentActivity);
+  const Lecture = useSelector((state: StateType) => state.Activity.currentLecture);
   const [answer, setAnswer] = useState("")
   const handleOnPress = () => {
     navigation.goBack();
@@ -44,7 +44,7 @@ const StudentLessonScreen = () => {
               color: 'white',
               fontSize: 20,
               fontWeight: "bold"
-            }}>{Activity?.title}</Text>
+            }}>{Lecture?.title}</Text>
         </View>
         <View style={{ flex: 1 }}>
           <Icon source={IMAGES.ic_catRead} size={100} />
@@ -59,17 +59,17 @@ const StudentLessonScreen = () => {
         }}>
         <View
           style={{
-            marginTop: 40,
+            marginVertical: 40,
             marginHorizontal: 20,
           }}>
           <Text style={{ color: '#000', fontSize: 20, fontWeight: 'bold' }}>
-            {Activity?.instructions}
+            {Lecture?.instructions}
           </Text>
         </View>
       </View>
 
       {
-        Activity?.filesRef && Activity?.filesRef.map((fileRef: string, i) => {
+        Lecture?.filesRef && Lecture?.filesRef.map((fileRef: string, i) => {
           return (
             <TouchableOpacity key={i} style={styles.fileCard} onPress={() => viewFile(fileRef)}>
               <Text style={styles.fileName}>{getFileName(fileRef)}</Text>

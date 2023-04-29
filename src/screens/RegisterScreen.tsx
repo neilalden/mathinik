@@ -61,7 +61,7 @@ const RegisterScreen = (props) => {
       phoneNumber,
       isTeacher: false,
       dateCreated: new Date(),
-      classId: "0418-0000"
+      classId: null
     }
     const registration = await dispatch(registerUser(data))
     if (asyncThunkFullfiled(registration)) {

@@ -93,7 +93,8 @@ const styles = StyleSheet.create({
     answerContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        alignItems: "center"
     },
     answerButton: {
         backgroundColor: '#B3FFD9',
@@ -130,15 +131,17 @@ const styles = StyleSheet.create({
 
     answeredButton: {
         backgroundColor: COLORS.RED,
-        paddingVertical: 10,
+        paddingTop: 10,
         paddingHorizontal: 15,
         borderRadius: 25,
         marginBottom: 10,
+        flexWrap: "nowrap"
     },
     answeredButtonText: {
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+        textAlign: "center"
     },
     correctAnswer: {
         backgroundColor: '#00CC66',

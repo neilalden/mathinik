@@ -32,7 +32,7 @@ const StudentQuizScreen = (props) => {
   useEffect(() => {
     (async () => {
       const dispatched = await dispatch(getQuizSubmission({
-        studentId: User?.id,
+        studentId: Quiz.studentId || User?.id,
         classId: User?.classId,
         quizId: Quiz?.id
       }));
@@ -52,7 +52,8 @@ const StudentQuizScreen = (props) => {
             score: score,
             createdAt: new Date(),
             id: User.id,
-            name: User.fullname
+            name: User.fullname,
+            photoUrl: User.photoURL
           },
           classId: User.classId || User.id,
           quizId: Quiz.id

@@ -60,7 +60,7 @@ const LandingScreen = (props) => {
       </View>
       <Icon source={IMAGES.ic_catSmile} size={240} />
       <Button
-        text={'Continue wtih google'}
+        text={'Continue wtih Google'}
         gradientColor={[COLORS.LIGHTGREEN, COLORS.MIDGREEN, COLORS.GREENNORMAL]}
         textStyle={{ paddingHorizontal: 20 }}
         onPress={handleOnPress}

@@ -18,13 +18,13 @@ import { getPeriodOfDay } from '../common/utils/time';
 import { useDispatch, useSelector } from 'react-redux';
 import { StateType } from '../services/redux/type';
 import { firebaseCurrentUser, signOut } from '../services/auth/googleSignIn';
-import { getTodos } from '../services/redux/slice/todo';
+import { deleteTodo, deleteTodoType, getTodos } from '../services/redux/slice/todo';
 import { getTodoColor, getTotalPoints } from '../common/utils/utility';
-import { ActivitySubmission, ActivityType, FirebaseCurrentUserType, QuizType, TodoType } from '../common/types';
+import { ActivitySubmission, ActivityType, FirebaseCurrentUserType, LectureType, QuizType, TodoType } from '../common/types';
 import firestore from '@react-native-firebase/firestore';
 import { asyncThunkFullfiled, customTypeOf, isActivity, isLecture, isQuiz, isValid } from '../common/validation';
-import { setCurrentQuiz } from "../services/redux/slice/quiz"
-import { getActivitySubmissions, setCurrentActivity } from "../services/redux/slice/activity"
+import { getQuizSubmission, getQuizSubmissions, setCurrentQuiz } from "../services/redux/slice/quiz"
+import { getActivitySubmissions, setCurrentActivity, setCurrentLecture } from "../services/redux/slice/activity"
 import { getClassDetails } from '../services/redux/slice/class';
 import auth from "@react-native-firebase/auth";
 import { fetchUser } from '../services/redux/slice/user';
@@ -42,12 +42,13 @@ const HomeScreen = (props) => {
   const user = useSelector((state: StateType) => state.User.user)
   const submissions = useSelector((state: StateType) => state.Todo.submissions);
   const todos = useSelector((state: StateType) => state.Todo.todos)
-  const displayName = String(user?.fullname).split(" ").slice(0, 2).join(" ");
+  const displayName = String(user?.fullname).split(" ").slice(0, 3).join(" ");
   const classDetails = useSelector((state: StateType) => state.Class?.classDetails);
   const [hasAnswered, setHasAnswered] = useState(0);
   const [activityAnswers, setActivityAnswers] = useState<Array<ActivitySubmission & ActivityType>>([])
   const [selectedActivity, setSelectedActivity] = useState<ActivitySubmission & ActivityType>()
 
+  const [currTodo, setCurrTodo] = useState(undefined);
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(async (firebaseCurrentUser: FirebaseCurrentUserType) => {
       if (!firebaseCurrentUser) navigation.navigate(ROUTES.LANDING_SCREEN)
@@ -127,6 +128,15 @@ const HomeScreen = (props) => {
     const todoType = customTypeOf(todo);
     if (todoType === "quiz") {
       const quiz: QuizType = todo
+      if (user.isTeacher) {
+        const x = await getQuizSubmissions({ classId: classDetails?.classId, quizId: todo.id })
+        setActivityAnswers(x)
+        setSelectedActivity(quiz)
+        refRBSheet.current.open()
+        setCurrTodo(todo)
+        return;
+      }
+
       dispatch(setCurrentQuiz(quiz))
       navigation.navigate(ROUTES.STUDENT_QUIZ_SCREEN);
     }
@@ -138,18 +148,30 @@ const HomeScreen = (props) => {
         setActivityAnswers(x)
         setSelectedActivity(activity)
         refRBSheet.current.open()
+        setCurrTodo(todo)
         return;
       }
 
       dispatch(setCurrentActivity(activity))
       navigation.navigate(ROUTES.STUDENT_ACTIVITY_SCREEN)
     }
+    else if (todoType === "lecture") {
+      const lecture: LectureType = todo
+
+      dispatch(setCurrentLecture(lecture))
+      navigation.navigate(ROUTES.STUDENT_LESSON_SCREEN)
+
+    }
   }
   const openActivitySubmission = (index: number) => {
     const activity: ActivitySubmission = activityAnswers[index];
-    dispatch(setCurrentActivity({ ...activity, ...selectedActivity, studentId: activity.id, id: selectedActivity?.id }))
-
     refRBSheet.current.close()
+    if (!!activity.answers) {
+      dispatch(setCurrentQuiz({ ...selectedActivity, studentId: activity.id, id: selectedActivity?.id }))
+      navigation.navigate(ROUTES.STUDENT_QUIZ_SCREEN)
+      return
+    }
+    dispatch(setCurrentActivity({ ...activity, ...selectedActivity, studentId: activity.id, id: selectedActivity?.id }))
     navigation.navigate(ROUTES.STUDENT_ACTIVITY_SCREEN)
   }
 
@@ -163,9 +185,58 @@ const HomeScreen = (props) => {
       { text: 'No', onPress: () => false },
     ]);
   }
+  const handleDeleteTodo = () => {
+    if (!currTodo) return;
+
+    Alert.alert(`Delete ${currTodo.title}?`, 'Are you sure you want to delete this todo from your class', [
+      {
+        text: 'yes',
+        onPress: async () => {
+          const todoType = customTypeOf(currTodo) === "quiz" ? "quizes" : "activities";
+          const data: deleteTodoType = {
+            todoId: currTodo.id,
+            todoType,
+            classId: classDetails?.classId
+          }
+          const dispatched = await dispatch(deleteTodo(data))
+          if (asyncThunkFullfiled(dispatched)) {
+            refRBSheet.current.close()
+          }
+        },
+        style: 'cancel',
+      },
+      { text: 'No', onPress: () => false },
+    ]);
+  }
 
 
   if (!user) navigation.navigate(ROUTES.LANDING_SCREEN);
+  if (!classDetails) {
+    return (
+
+      <ScrollView style={{ backgroundColor: '#E0EBEB' }} >
+        <View
+          style={styles.headerContainer}>
+          <Text
+            style={styles.headerGreetText}>{`${getPeriodOfDay()}\n${displayName}`}</Text>
+          <Icon
+            onPress={handleLogout}
+            source={{ uri: user?.photoURL }}
+            size={80}
+            imageStyle={styles.profilePicture}
+          />
+        </View>
+        <Text
+          style={{
+            fontSize: 12,
+            color: '#000',
+            textAlign: 'center',
+            marginTop: 10,
+          }}>You aren't in any class yet</Text>
+      </ScrollView>
+
+    )
+  }
   else
     return (
       <>
@@ -203,7 +274,8 @@ const HomeScreen = (props) => {
 
           {
             todos.length > 0 ?
-              todos.map((todo: TodoType, i) => {
+              [...todos].sort((a, b) => new Date(b.deadline) - new Date(a.deadline)
+              ).map((todo: TodoType, i) => {
                 const color = getTodoColor(todo)
                 const points = getTotalPoints(todo);
                 return (
@@ -213,7 +285,7 @@ const HomeScreen = (props) => {
                       style={styles.cardContainer}>
                       <View style={styles.cardTitleContainer}>
                         <Text style={styles.cardTitle1}>{todo.title}</Text>
-                        <Text style={styles.cardTitle2}>{points} points</Text>
+                        {!!todo.datePosted ? <Text style={styles.cardTitle2}>{new Date(todo.deadline).toDateString()}</Text> : <Text style={styles.cardTitle2}>{points} points</Text>}
                       </View>
                       {
                         todo.topScorer ?
@@ -258,13 +330,16 @@ const HomeScreen = (props) => {
             }}
           >
             <ScrollView style={styles.sheetContainer}>
-              <Text style={[styles.text, { margin: 20, textAlign: "center", fontWeight: "bold" }]}>Submissions</Text>
+              <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <Text>s</Text>
+                <Text style={[styles.text, { margin: 20, textAlign: "center", fontWeight: "bold", paddingLeft: 20 }]}>Submissions</Text>
+
+                <TouchableOpacity onPress={handleDeleteTodo}>
+                  <Text style={{ alignSelf: "center", marginRight: 10, padding: 5, }}>🗑️</Text>
+                </TouchableOpacity>
+              </View>
               {activityAnswers && activityAnswers.map((student, _) => {
                 return <TouchableOpacity key={_} style={styles.textContainer} onPress={() => openActivitySubmission(_)}>
-                  <Text
-                    style={styles.text}>
-                    {student.name}
-                  </Text>
                   <View style={{ borderRadius: 100 }}>
                     <Icon
                       imageStyle={{
@@ -275,6 +350,11 @@ const HomeScreen = (props) => {
                       size={30}
                     />
                   </View>
+                  <Gap width={10} />
+                  <Text
+                    style={styles.text}>
+                    {student.name}
+                  </Text>
                 </TouchableOpacity>
               })}
             </ScrollView>
@@ -351,13 +431,11 @@ const styles = StyleSheet.create({
   textContainer: {
     flexDirection: 'row',
     alignSelf: 'center',
-    alignItems: 'center',
     width: '80%',
     paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: "#00cc66",
     borderRadius: 16,
-    justifyContent: 'space-between',
     paddingVertical: 10,
     marginBottom: 10,
   },
