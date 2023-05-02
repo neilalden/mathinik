@@ -1,22 +1,27 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from '../components/Icon';
 import { IMAGES } from '../common/images';
 import LinearGradient from 'react-native-linear-gradient';
 import { COLORS } from '../common/utils/colors';
-import { Button } from '../components/Buttons';
+import { Button, ButtonOutline } from '../components/Buttons';
 import { ROUTES } from '../common/routes';
 import { StateType } from '../services/redux/type';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Gap from '../components/Gap';
 import { getFileName, viewFile } from '../common/utils/utility';
+import { asyncThunkFullfiled } from '../common/validation';
+import { deleteTodo, deleteTodoType } from '../services/redux/slice/todo';
 
 
 const StudentLessonScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
+  const dispatch = useDispatch()
   const Lecture = useSelector((state: StateType) => state.Activity.currentLecture);
+  const Class = useSelector((state: StateType) => state.Class.classDetails);
+  const User = useSelector((state: StateType) => state.User.user)
   const [answer, setAnswer] = useState("")
   const handleOnPress = () => {
     navigation.goBack();
@@ -24,6 +29,30 @@ const StudentLessonScreen = () => {
   const handleBack = () => {
     navigation.goBack();
   };
+  const handleDeleteLecture = () => {
+    if (!User?.isTeacher) return;
+
+    Alert.alert('Delete', `Delete ${Lecture?.title}?`, [
+      {
+        text: 'yes',
+        onPress: () => {
+          (async () => {
+            const data: deleteTodoType = {
+              classId: Class?.classId,
+              todoId: Lecture?.id,
+              todoType: "lectures"
+            }
+            const dispatched = await dispatch(deleteTodo(data))
+            if (asyncThunkFullfiled(dispatched)) {
+              navigation.navigate(ROUTES.HOME_SCREEN)
+            }
+          })();
+        },
+        style: 'cancel',
+      },
+      { text: 'No', onPress: () => false },
+    ]);
+  }
 
 
 
@@ -76,10 +105,19 @@ const StudentLessonScreen = () => {
             </TouchableOpacity>
           )
         })}
+
+      {User?.isTeacher ? <ButtonOutline text={"Delete Lecture"} onPress={handleDeleteLecture} containerStyle={styles.deleteButtonContainer} textStyle={styles.deleteButtonText} /> : null}
     </ScrollView>
   );
 };
 const styles = StyleSheet.create({
+  deleteButtonContainer: {
+    borderColor: COLORS.RED,
+    margin: 16,
+  },
+  deleteButtonText: {
+    color: COLORS.RED
+  },
   textInputtitle: { fontWeight: 'bold', color: COLORS.BLACK },
   instructionsCard: {
     backgroundColor: 'white',

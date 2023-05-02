@@ -13,6 +13,7 @@ import { getFileName, viewFile } from '../common/utils/utility';
 import { asyncThunkFullfiled, isValid } from '../common/validation';
 import { getActivitySubmission, gradeStudentActivity, submitActivity } from '../services/redux/slice/activity';
 import { SubmitActivityGradeType, SubmitActivityType } from '../common/types';
+import AwesomeAlert from 'react-native-awesome-alerts';
 
 
 const StudentLessonScreen = (props) => {
@@ -23,6 +24,8 @@ const StudentLessonScreen = (props) => {
   const Activity = useSelector((state: StateType) => state.Activity.currentActivity);
   const [answer, setAnswer] = useState("");
   const [grade, setGrade] = useState("");
+  const [showAlert, setShowAlert] = useState(false)
+  const [alertMessage, setAlertMessage] = useState("")
 
   useEffect(() => {
     (async () => {
@@ -94,7 +97,6 @@ const StudentLessonScreen = (props) => {
     }
     const dispatched = await dispatch(gradeStudentActivity(data))
     if (asyncThunkFullfiled(dispatched)) {
-      console.log(dispatched)
       navigation.goBack();
     }
   }
@@ -153,7 +155,7 @@ const StudentLessonScreen = (props) => {
       {
         Activity?.filesRef && Activity?.filesRef.map((fileRef: string, i) => {
           return (
-            <TouchableOpacity key={i} style={styles.fileCard} onPress={() => viewFile(fileRef)}>
+            <TouchableOpacity key={i} style={styles.fileCard} onPress={() => viewFile(fileRef, setShowAlert)}>
               <Text style={styles.fileName}>{getFileName(fileRef)}</Text>
             </TouchableOpacity>
           )
@@ -169,7 +171,7 @@ const StudentLessonScreen = (props) => {
           </Text>
         </View>
         <View style={{ marginLeft: 6, paddingTop: 12 }}>
-          <TextInput multiline={true} style={{ fontSize: 16 }} value={Activity.answer || answer} onChangeText={(text) => setAnswer(text)} />
+          <TextInput multiline={true} style={{ fontSize: 16 }} value={Activity?.answer || answer} onChangeText={(text) => setAnswer(text)} />
         </View>
       </View>
       {!Activity.answer ?
@@ -202,8 +204,20 @@ const StudentLessonScreen = (props) => {
             onPress={handleEnterGrade}
           />
         </>
-
         : null}
+
+      <AwesomeAlert
+        show={showAlert}
+        showProgress={true}
+        title={"Downloading file..."}
+        message={alertMessage}
+        closeOnTouchOutside={true}
+        closeOnHardwareBackPress={false}
+        showCancelButton={true}
+        cancelText="Close"
+        cancelButtonColor={COLORS.RED}
+        onCancelPressed={() => setShowAlert(false)}
+      />
     </ScrollView>
   );
 };

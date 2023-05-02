@@ -135,6 +135,7 @@ const LeaderboardsScreen = () => {
               if (i === 0) return null
               return (
                 <View
+                  key={i}
                   style={{
                     flexDirection: 'row',
                     alignSelf: 'center',

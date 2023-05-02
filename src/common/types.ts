@@ -97,7 +97,7 @@ export type ActivitySubmission = {
     createdAt: Date;
     id: StudentAccountType["id"];
     name: StudentAccountType["fullname"];
-    photoURL?: StudentAccountType["photoURL"]
+    photoUrl?: StudentAccountType["photoURL"]
 }
 
 export type QuizSubmission = {

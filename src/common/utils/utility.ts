@@ -1,5 +1,5 @@
 import { PermissionsAndroid, ToastAndroid } from "react-native";
-import { QuizType, TodoType } from "../types";
+import { QuizType, setStateBoolean, TodoType } from "../types";
 import DocumentPicker from 'react-native-document-picker';
 import { isActivity, isLecture, isQuiz } from "../validation";
 import { COLORS } from "./colors";
@@ -97,32 +97,21 @@ export const openFile = (setFiles: React.Dispatch<React.SetStateAction<any[]>>) 
         })
         .catch(e => alert(`${e}`));
 };
-export const viewFile = (fileRef: string) => {
+export const viewFile = (fileRef: string, setShowAlert: setStateBoolean | undefined = undefined) => {
     const dir = `${RNFS.DownloadDirectoryPath}/mathinik`;
     const fileName = getFileName(fileRef);
     const dirFile = dir + "/" + fileName;
     RNFS.exists(dirFile).then(exists => {
         if (exists) {
-
-            ToastAndroid.showWithGravity(
-                'Loading...',
-                ToastAndroid.LONG,
-                ToastAndroid.BOTTOM,
-            );
             FileViewer.open(dirFile);
         } else {
+            if (setShowAlert) setShowAlert(true)
             storage()
                 .ref(fileRef)
                 .getDownloadURL()
                 .then(url => {
                     RNFS.exists(dir).then(
                         res => {
-                            ToastAndroid.showWithGravity(
-                                'Loading...',
-                                ToastAndroid.LONG,
-                                ToastAndroid.BOTTOM,
-                            );
-
                             if (!res) {
                                 RNFS.mkdir(dir);
                             }
@@ -132,6 +121,7 @@ export const viewFile = (fileRef: string) => {
                             })
                                 .promise.then((x) => {
 
+                                    if (setShowAlert) setShowAlert(false)
                                     FileViewer.open(dirFile)
                                 })
                                 .then(() => { })

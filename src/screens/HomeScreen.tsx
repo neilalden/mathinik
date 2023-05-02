@@ -158,9 +158,9 @@ const HomeScreen = (props) => {
     else if (todoType === "lecture") {
       const lecture: LectureType = todo
 
+
       dispatch(setCurrentLecture(lecture))
       navigation.navigate(ROUTES.STUDENT_LESSON_SCREEN)
-
     }
   }
   const openActivitySubmission = (index: number) => {
@@ -331,7 +331,7 @@ const HomeScreen = (props) => {
           >
             <ScrollView style={styles.sheetContainer}>
               <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                <Text>s</Text>
+                <Text></Text>
                 <Text style={[styles.text, { margin: 20, textAlign: "center", fontWeight: "bold", paddingLeft: 20 }]}>Submissions</Text>
 
                 <TouchableOpacity onPress={handleDeleteTodo}>
@@ -346,7 +346,7 @@ const HomeScreen = (props) => {
                         borderRadius: 100,
                         backgroundColor: 'gray',
                       }}
-                      source={{ uri: student.photoURL }}
+                      source={{ uri: student.photoUrl || student.photoURL }}
                       size={30}
                     />
                   </View>

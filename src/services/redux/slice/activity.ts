@@ -70,42 +70,47 @@ export const addActivity = createAsyncThunk("activity/addActivity", (data: Activ
 
 
 export const addLecture = createAsyncThunk("lectures/addLecture", (data: LectureType) => {
-    const firebaseCurrentUser: FirebaseCurrentUserType = auth().currentUser;
-    if (!firebaseCurrentUser?.displayName) return undefined
-    const docId = firestore().collection(`Classes/${firebaseCurrentUser?.displayName}/lectures`).doc().id;
-    data.id = docId;
-    const files = data.files ?? []
-    const path: string = firebaseCurrentUser?.displayName || ""
-    const urls: Array<string> = []
-    if (files) {
-        for (const file of files) {
-            const reference = storage().ref(`${path}/${file.fileName}`);
-            reference
-                .putFile(file.uri)
-                .then(() => {
-                    urls.push(`${path}/${file.fileName}`);
-                    if (urls.length === files.length) {
-                        data.filesRef = urls
-                        delete data.files
-                        return firestore()
-                            .collection(`Classes/${path}/lectures`)
-                            .doc(data.id)
-                            .set(data)
-                            .then(() => "success")
-                            .catch(error => console.error(error));
-                    }
-                })
-                .catch(error => {
-                    console.error("errorz: ", error);
-                });
+    try {
+
+        const firebaseCurrentUser: FirebaseCurrentUserType = auth().currentUser;
+        if (!firebaseCurrentUser?.displayName) return undefined
+        const docId = firestore().collection(`Classes/${firebaseCurrentUser?.displayName}/lectures`).doc().id;
+        data.id = docId;
+        const files = data.files ?? []
+        const path: string = firebaseCurrentUser?.displayName || ""
+        const urls: Array<string> = [];
+        if (files.length > 0) {
+            for (const file of files) {
+                const reference = storage().ref(`${path}/${file.fileName}`);
+                reference
+                    .putFile(file.uri)
+                    .then(() => {
+                        urls.push(`${path}/${file.fileName}`);
+                        if (urls.length === files.length) {
+                            data.filesRef = urls
+                            delete data.files
+                            return firestore()
+                                .collection(`Classes/${path}/lectures`)
+                                .doc(data.id)
+                                .set(data)
+                                .then(() => "success")
+                                .catch(error => console.error(error));
+                        }
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            }
+        } else {
+            return firestore()
+                .collection(`Classes/${firebaseCurrentUser?.displayName}/lectures`)
+                .doc(data.id)
+                .set(data)
+                .then(() => "success")
+                .catch((error) => console.error(error))
         }
-    } else {
-        return firestore()
-            .collection(`Classes/${firebaseCurrentUser?.displayName}/lectures`)
-            .doc(data.id)
-            .set(data)
-            .then(() => "success")
-            .catch((error) => error)
+    } catch (error) {
+        console.error(error)
     }
 })
 

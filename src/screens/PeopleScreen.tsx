@@ -34,7 +34,6 @@ const PeopleScreen = (props) => {
   }
   const handleDeleteStudent = (student: StudentAccountType) => {
     if (!user?.isTeacher) return;
-    console.log(student)
     Alert.alert(`Remove student`, `Are you sure you want to remove ${student.fullname} from your class?`, [
       {
         text: 'yes',

@@ -54,10 +54,9 @@ export const getSubmissions = createAsyncThunk("todo/getSubmissions", async (pay
 export type deleteTodoType = {
     classId: ClassType["classId"];
     todoId: TodoType["id"];
-    todoType: "quizes" | "activities"
+    todoType: "quizes" | "activities" | "lectures"
 }
 export const deleteTodo = createAsyncThunk("todo/deleteTodo", async (payload: deleteTodoType) => {
-    console.log(payload)
 
     return await firestore().collection(`Classes/${payload.classId}/${payload.todoType}`).doc(payload.todoId).delete().then(() => "success").catch(error => console.error(error))
 })
